@@ -20,7 +20,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
       $_SESSION['admin_Id'] = $row['admin_Id'];
       $_SESSION['user_name'] = $row['user_name'];
           
-      header('Location: ../dashboard.html');
+      header('Location: dashboard.php');
     } else {
       echo "<script>
               document.addEventListener('DOMContentLoaded', function() {
