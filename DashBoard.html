@@ -18,7 +18,12 @@
       background-repeat: no-repeat;
 
     }
-
+    section {
+            margin-top: 200px;
+            padding: 50px;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+        }
     /* Sidebar */
     .sidebar {
       width: 250px;
@@ -119,6 +124,8 @@
 
     .navbar {
       display: flex;
+      position: fixed;
+      width: calc(95.5% - 250px);
       justify-content: space-between;
       align-items: center;
       background-color: #c0bd62;
@@ -140,6 +147,7 @@
     /* Dashboard Cards */
     .dashboard-cards {
       display: flex;
+      margin-top: 20px;
       gap: 20px;
       flex-wrap: wrap;
     }
@@ -254,13 +262,24 @@
     <div class="navbar">
       <div class="search-bar">
         <input type="button" placeholder="Add Instructor" value="Add Instructor">
+        
       </div>
+      <select style="width: 400px; height: 40px; border-radius: 20px;font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 16px; text-align: center; background-color: rgba(240, 248, 255, 0.3); border-color: #f8d700;">
+        <option value="#">Easy to Navigation</option>
+        <option value="Pendinng-user-List">Pendinng user List</option>
+        <option value="Instructor-List">Instructor List</option>
+        <option value="Membership-have-User-List">Membership have User List</option>
+        <option value="Instructor-have-User-List">Instructor have User List</option>
+        
+      </select>
       <div class="profile">
         <img src="IMG/prof.png" alt="User">
-        <span>chamika</span>
+        <span style="font-weight: bold;">chamika</span>
       </div>
     </div>
+   <div style="width: 100%; height: 100px;"> 
 
+   </div>
     <!-- Dashboard Cards -->
     <div class="dashboard-cards">
       <div class="card">

@@ -1,3 +1,24 @@
+<?php
+
+include 'phpcon.php';
+
+session_start();
+if (!isset($_SESSION['admin_Id'])) {
+  header('location:index.php');
+}
+
+
+
+
+
+
+
+
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -318,7 +339,7 @@
     <header>
       <h1>Verifications Membership</h1>
     </header>
-    <button id="back-button" onclick="window.history.back()">Back</button>
+    <button id="back-button" onclick="window.location.href='DashBoard.php'">Back</button>
 
     <main>
       <div class="search-bar">

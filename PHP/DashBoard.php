@@ -1,6 +1,13 @@
 <?php
+header("Cache-Control: no-cache, no-store, must-revalidate"); 
+header("Pragma: no-cache");
+header("Expires: 0"); 
+
 session_start();
 include 'phpcon.php';
+$date = date('Y-m-d H:i:s');
+$date_now = date('Y-m-d');
+
 $pendign_user = 0;
 
 if(isset($_SESSION['admin_Id'])) {
@@ -40,7 +47,7 @@ if ($result_pending_user->num_rows > 0) {
   $pendign_user = "N/A";
 }
 
-$sql_m_user = "SELECT COUNT(*) AS total_users_pending FROM users WHERE membership_status = 1 ";  // Replace your_table_name with the actual table name
+$sql_m_user = "SELECT COUNT(*) AS total_users_pending FROM users WHERE membership_status = 1 ";  
 $result_m_user = $conn->query($sql_m_user);
 
 if ($result_m_user->num_rows > 0) {
@@ -50,7 +57,7 @@ if ($result_m_user->num_rows > 0) {
   $m_user = "N/A";
 }
 
-$sql_I_user = "SELECT COUNT(*) AS total_users_pending FROM users WHERE instructor_status = 1 ";  // Replace your_table_name with the actual table name
+$sql_I_user = "SELECT COUNT(*) AS total_users_pending FROM users WHERE instructor_status = 1 ";  
 $result_I_user = $conn->query($sql_I_user);
 
 if ($result_I_user->num_rows > 0) {
@@ -60,6 +67,25 @@ if ($result_I_user->num_rows > 0) {
   $I_user = "N/A";
 }
 
+$sql_revenue = "SELECT SUM(m.cost) AS total_revenue
+                FROM membership_user AS m
+                JOIN users AS u ON m.user_id = u.user_id
+                WHERE m.end_date >= CURDATE() 
+                AND u.membership_status = 1;
+                ";  
+$result_revenue = $conn->query($sql_revenue);
+if ($result_revenue->num_rows > 0) {
+  $row = $result_revenue->fetch_assoc();
+  $revenue = $row['total_revenue'];
+} else {
+  $revenue = "N/A";
+}
+
+if(isset($_POST['logout'])) {
+  session_destroy();
+  echo json_encode(array('success' => true));
+  exit();
+}
 
 ?>
 
@@ -71,6 +97,9 @@ if ($result_I_user->num_rows > 0) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Dashboard</title>
   
   <style>
@@ -85,7 +114,12 @@ if ($result_I_user->num_rows > 0) {
       background-repeat: no-repeat;
 
     }
-
+    section {
+            margin-top: 200px;
+            padding: 50px;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+        }
     /* Sidebar */
     .sidebar {
       width: 250px;
@@ -186,11 +220,13 @@ if ($result_I_user->num_rows > 0) {
 
     .navbar {
       display: flex;
+      position: fixed;
+      width: calc(95.5% - 250px);
       justify-content: space-between;
       align-items: center;
       background-color: #c0bd62;
-      padding: 15px;
-      margin-bottom: 20px;
+      padding: 10px; 
+      margin-bottom: 10px;
     }
 
     .search-bar input {
@@ -240,7 +276,16 @@ if ($result_I_user->num_rows > 0) {
       color: azure;
       
     }
-
+    .Logout-button{
+      width: 100%;
+      height: 100%;
+      background-color: transparent;
+      border: none;
+      text-align: left;
+      color: red;
+      font-size: 18px;
+      cursor: pointer;
+    }
     /* Responsive Styles */
     @media (max-width: 1024px) {
       .card {
@@ -298,6 +343,31 @@ if ($result_I_user->num_rows > 0) {
       }
     }
   </style>
+  <script>
+        
+        function updateTime() {
+            
+            let currentTime = new Date();
+            
+            let formattedTime = currentTime.getFullYear() + '-' +
+                ('0' + (currentTime.getMonth() + 1)).slice(-2) + '-' +
+                ('0' + currentTime.getDate()).slice(-2) + ' ' +
+                ('0' + currentTime.getHours()).slice(-2) + ':' +
+                ('0' + currentTime.getMinutes()).slice(-2) + ':' +
+                ('0' + currentTime.getSeconds()).slice(-2);
+            
+            document.getElementById('liveTime').innerHTML = formattedTime;
+        }
+
+        
+        window.onload = function() {
+            setInterval(updateTime, 1000); 
+        };
+        
+        
+
+
+    </script>
 </head>
 
 <body>
@@ -306,13 +376,13 @@ if ($result_I_user->num_rows > 0) {
     <div class="logo">FITNESS ZONE</div>
     <ul class="nav-links">
 
-      <li><a href="instructor.html">Instructor</a></li>
-      <li><a href="appoinment.html">appoinments</a></li>
-      <li><a href="news.html">News</a></li>
-      <li><a href="appoinment.html">Verifications</a></li>
-      <li><a href="appoinment.html">instruct Upadte</a></li>
-      <li><a href="#">Membership update</a></li>
-      <li><input type="button" value="Log out"></li>
+      <li><a href="instructor.html">Instructor Login</a></li>
+      <li><a href="Passwordchek.php">Verifications Membership</a></li>
+      <li><a href="news.html">Membership Manage</a></li>
+      <li><a href="appoinment.html">Online Class Manage</a></li>
+      <li><a href="appoinment.html">Instruct Display Manage</a></li>
+      <li><a href="#">Report Generator</a></li>
+      <li><input id="Logout-btn" class="Logout-button" type="button" value="Log out"></li>
 
     </ul>
   </div>
@@ -323,13 +393,23 @@ if ($result_I_user->num_rows > 0) {
     <div class="navbar">
       <div class="search-bar">
         <input type="button" placeholder="Add Instructor" value="Add Instructor">
-      </div>
+     </div>
+     <select id="scrollSelect" style="width: 400px; height: 40px; border-radius: 20px;font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 16px; text-align: center; background-color: rgba(240, 248, 255, 0.3); border-color: #f8d700;">
+        <option value="Home">Easy to Navigation</option>
+        <option value="Pendinng-user-List">Pendinng user List</option>
+        <option value="Instructor-List">Instructor List</option>
+        <option value="Membership-have-User-List">Membership have User List</option>
+        <option value="Instructor-have-User-List">Instructor have User List</option>
+        
+      </select>
       <div class="profile">
-        <span><?php echo $adminName; ?></span>
-        <span>(<?php echo $adminID; ?>)</span>
+        <span style="font-weight: bold; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 18px; "><?php echo $adminName; ?></span>
+        <span style="font-weight: bold; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 18px; ">(<?php echo $adminID; ?>)</span>
+        <span id="liveTime" style="font-weight: bold; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 18px; "><?php echo $date; ?></span>
       </div>
     </div>
-
+    <div id="Home" style="width: 100%; height: 100px;"> 
+    </div>
     <!-- Dashboard Cards -->
     <div class="dashboard-cards">
       <div class="card">
@@ -354,14 +434,14 @@ if ($result_I_user->num_rows > 0) {
       </div>
       <div class="card">
         <h3 style=" text-align:center">Revenue</h3>
-        <p style="font-weight: bold; font-size:20px; text-align:center; color:green">RS : 25000.00</p>
+        <p style="font-weight: bold; font-size:20px; text-align:center; color:green">RS :<?php echo $revenue?>.00</p>
       </div>
       <!-- Add more cards -->
     </div>
 
     <!-- Table for Data -->
     <div class="data-table">
-      <h3>Pending User List</h3>
+      <h3 id="Pendinng-user-List">Pending User List</h3>
       <table>
         <thead>
           <tr>
@@ -406,7 +486,7 @@ if ($result_I_user->num_rows > 0) {
         </tbody>
       </table>
       <hr>
-      <h3>Instructor List</h3>
+      <h3 id ="Instructor-List">Instructor List</h3>
       <table border="1">
         <thead>
           <tr>
@@ -446,7 +526,7 @@ if ($result_I_user->num_rows > 0) {
         </tbody>
       </table>
       <hr>
-      <h3>Membership have User List</h3>
+      <h3 id ="Membership-have-User-List">Membership have User List</h3>
       <table>
         <thead>
           <tr>
@@ -458,6 +538,7 @@ if ($result_I_user->num_rows > 0) {
             <th>Phone Number</th>
             <th>Age</th>
             <th>Membership Plan</th>
+           
           </tr>
         </thead>
         <tbody>
@@ -490,7 +571,7 @@ if ($result_I_user->num_rows > 0) {
         </tbody>
       </table>
       <hr>
-      <h3>Instructor have User List</h3>
+      <h3 id = "Instructor-have-User-List">Instructor have User List</h3>
       <table>
         <thead>
           <tr>
@@ -537,7 +618,36 @@ if ($result_I_user->num_rows > 0) {
 
   </div>
 
-  <script src="js/script.js"></script>
+  <script>
+    document.getElementById('scrollSelect').addEventListener('change', function() {
+        var selectedValue = this.value;
+
+        // Only scroll if the value is not the default "#"
+        if (selectedValue !== "#") {
+            // Find the element by the selected value (ID) and scroll to it
+            var targetDiv = document.getElementById(selectedValue);
+            if (targetDiv) {
+                targetDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    });
+    document.getElementById('Logout-btn').addEventListener('click', function() {
+        if (confirm('Are you sure you want to log out?')) {
+            let formData = new FormData();
+            formData.append('logout', 'logout');
+            fetch('DashBoard.php', {
+              method: 'POST',
+              body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+            window.location.href = 'index.php';
+              }
+          });
+        }
+          });
+  </script>
 </body>
 
 </html>
