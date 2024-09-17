@@ -431,30 +431,49 @@ if (!isset($_SESSION['admin_Id'])) {
           <table>
             <thead>
               <tr>
-                <th>User Id</th>
+              <th>User Id</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>NIC</th>
+                <th>Gender</th>
                 <th>Phone Number</th>
-                <th>Paymnet Slip</th>
                 <th>Age</th>
                 <th>Membership Plan</th>
+                <th>Paymnet Slip</th>
                 <th>Verifications</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>001</td>
-                <td>123</td>
-                <td>Payed</td>
-                <td>Payed</td>
-                <td>Payed</td>
-                <td><button onclick="ViewPaymnetSlipAfterV()">View</button></td>
-                <td>Payed</td>
-                <td>Payed</td>
-                <td><button onclick="UnVerification(userID)"
-                    style="background-color: yellow; color: black;">Unverified</button></td>
-              </tr>
+            <?php
+    
+              $sql = "SELECT user_id, email, user_name, NIC, gender, p_number, age, membership_plan 
+                       FROM users 
+                       WHERE membership_status = 1 AND payment_slip != 'null'";
+              $result = $conn->query($sql);
+
+
+    if ($result->num_rows > 0) {
+      while($row = $result->fetch_assoc()) {
+       echo "<tr>";
+       echo "<td>" . $row['user_id'] . "</td>";
+       echo "<td>" . $row['user_name'] . "</td>";
+       echo "<td>" . $row['email'] . "</td>";
+       echo "<td>" . $row['NIC'] . "</td>";
+       echo "<td>" . $row['gender'] . "</td>";
+       echo "<td>" . $row['p_number'] . "</td>";
+       echo "<td>" . $row['age'] . "</td>";
+       echo "<td>" . $row['membership_plan'] . "</td>";
+       echo '<td><button onclick="ViewPaymnetSlipAfterV(\'' . $row['user_id'] . '\')">View</button></td>';
+       echo '<td><button onclick="UnVerification(\'' . $row['user_id'] . '\') style="background-color: yellow; color: black;"">Unverified</button></td>';
+       echo "</tr>";
+      }
+    } else {
+   echo "<tr><td colspan='8'>No active members found</td></tr>";
+   }
+
+
+    ?>
+              
             </tbody>
           </table>
         </div>

@@ -478,7 +478,7 @@ if(isset($_POST['logout'])) {
                   echo "</tr>";
              }
            } else {
-             echo "<tr><td colspan='7'>No active members found</td></tr>";
+             echo "<tr><td colspan='8'>No active members found</td></tr>";
         }
 
    
