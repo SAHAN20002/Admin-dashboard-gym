@@ -45,7 +45,7 @@ function ViewPaymentSlip(userId) {
 }
 
 function Verified(){
-  
+
 if (!confirm('Are you sure you want to verify this user?')) {
   return;
 }
@@ -72,6 +72,34 @@ if (!confirm('Are you sure you want to verify this user?')) {
           alert('There was an error verifying the user.');
       });
 }
+
+function deletePhoto(){
+  if (!confirm('Are you sure you want to remove this user membership ?')) {
+    return;
+  }
+  let userId = document.getElementById('user_Id').innerText;
+  let form = new FormData();
+  form.append('userId', userId);
+  fetch('deleteUser.php', {
+      method: 'POST',
+      body: form
+  }).then(response => response.text())
+      .then(data => {
+          console.log(data);
+          if (data === '{"message":"User deleted."}') {
+              alert('Photo has been deleted successfully.');
+              document.getElementById('paymentSlip').style.display = 'none';
+              document.getElementById('body').style.filter = 'blur(0px)';
+              window.location.reload();
+          } else {
+              alert('There was an error deleting the photo.');
+          }
+      }).catch(error => {
+          console.error('Error deleting photo: ', error);
+          alert('There was an error deleting the photo.');
+      });
+}
+
 
 function Casel(){
   document.getElementById('paymentSlip').style.display = 'none';
