@@ -111,15 +111,100 @@ function Casel(){
   document.getElementById('body').style.filter = 'blur(0px)';
 }
 
-function ViewPaymnetSlipAfterV(){
-  document.getElementById('paymentSlipAfterV').style.display = 'block';
-  document.getElementById('div_1').style.filter = 'blur(5px)';
-  document.getElementById('div_2').style.filter = 'blur(5px)';
-  document.getElementById('div_3').style.filter = 'blur(5px)';
+function ViewPaymnetSlipAfterV(userId) {
+ var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'findslip.php?userId=' + encodeURIComponent(userId), true); // Encodes userId to prevent issues
+  xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+          try {
+              var response = JSON.parse(xhr.responseText);
+              console.log("Response: ", response);
+              // Check if the cost exists and update the plan price
+              
 
-  
+              if (response.photo_link) {
+                  // Set the photo link in the image element and show the div
+                //   console.log("Payment Slip URL: " + response.photo_link); // Logs the photo link URL
+                  document.getElementById('userPhotoAV').src = response.photo_link;
+                  document.getElementById('paymentSlipAfterV').style.display = 'block';
+                  document.getElementById('useridV').innerText =userId;
+
+                  document.getElementById('div_2').style.filter = 'blur(5px)';
+                  document.getElementById('div_1').style.filter = 'blur(5px)';
+                  document.getElementById('div_3').style.filter = 'blur(5px)';
+              } else {
+                  alert('No photo available for this user.');
+              }
+          } catch (e) {
+              console.error("Error parsing JSON response: ", e);
+              alert("There was an error processing the request.");
+          }
+      }
+  };
+  xhr.send();
 }
 
+function UnVerification(){
+    if (!confirm('Are you sure you want to Un-verify this user?')) {
+        return;
+    }
+    let userId = document.getElementById('useridV').innerText;
+    let form = new FormData();
+  form.append('userId', userId);
+  fetch('unverifiedUser.php', {
+      method: 'POST',
+      body: form
+  }).then(response => response.text())
+      .then(data => {
+          console.log(data);
+          if (data === '{"message":"Membership status updated."}') {
+              alert('User has been verified successfully.');
+              document.getElementById('paymentSlip').style.display = 'none';
+              document.getElementById('body').style.filter = 'blur(0px)';
+              window.location.reload();
+          } else {
+              alert('There was an error verifying the user.'+data);
+          }
+      }).catch(error => {
+          console.error('Error verifying user: ', error);
+          alert('There was an error verifying the user.');
+      });
+}
+
+// function ViewPaymnetSlipAfterV(){
+//   document.getElementById('paymentSlipAfterV').style.display = 'block';
+//   document.getElementById('div_1').style.filter = 'blur(5px)';
+//   document.getElementById('div_2').style.filter = 'blur(5px)';
+//   document.getElementById('div_3').style.filter = 'blur(5px)';
+
+  
+// }
+function DeleteUser(userId){
+    if (!confirm('Are you sure you want to delete this user?')) {
+        return;
+    }
+  let user_Id = userId;
+  let form = new FormData();
+  form.append('userId', user_Id);
+  fetch('DeleteUser_1.php', {
+      method: 'POST',
+      body: form
+  }).then(response => response.text())
+      .then(data => {
+          console.log(data);
+          if (data === '{"message":"user delete."}') {
+              alert('User has been delete successfully.');
+              
+              window.location.reload();
+          } else {
+              alert('There was an error delete the user.'+data);
+          }
+      }).catch(error => {
+          console.error('Error delete user: ', error);
+          alert('There was an error delete the user.');
+      });
+  
+}
 function CaselAfterV(){
   document.getElementById('paymentSlipAfterV').style.display = 'none';
   document.getElementById('div_1').style.filter = 'blur(0px)';

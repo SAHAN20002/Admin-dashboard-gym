@@ -12,13 +12,6 @@ if (!isset($_SESSION['Password'])) {
 
 
 
-
-
-
-
-
-
-
 ?>
 
 
@@ -417,13 +410,19 @@ if (!isset($_SESSION['Password'])) {
       <div id="paymentSlipAfterV"
         style="display:none;  width: 500px; height: 500px; z-index: 55; position: absolute;  margin-left: 350px;margin-top: 55vh; background-color: aliceblue; border-radius: 20px;">
         <div style="width: 100%; height: 85%;  display: flex; align-items: center; justify-content: center;">
-          <img id="userPhoto" src="" alt="User Payment Slip"
+          <img id="userPhotoAV" src="" alt="User Payment Slip"
             style="width: 95%; height: 95%;border: 1px solid black; border-radius: 20px;">
+        </div>
+        <div style="width:100%;height:5%;display:flex;align-items: center; justify-content: center;">
+           <h4 id="useridV" style="color: black;">User Id:</h4>
+           
         </div>
         <div style="width: 100%; height: 10%; display: flex; align-items: center;  justify-content: center;">
 
-          <button style="margin: 10px; width: 100px; color: black; font-weight: bold; height: 35px;"
+        <button onclick="UnVerification()" style="background-color: yellow; color: black; height: 35px;  font-weight: bold;">Unverified</button>
+        <button style="margin: 10px; width: 100px; color: black; font-weight: bold; height: 35px;"
             onclick="CaselAfterV()">Cansel</button>
+          
         </div>
       </div>
 
@@ -434,7 +433,7 @@ if (!isset($_SESSION['Password'])) {
           <table>
             <thead>
               <tr>
-              <th>User Id</th>
+                <th>User Id</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>NIC</th>
@@ -443,7 +442,7 @@ if (!isset($_SESSION['Password'])) {
                 <th>Age</th>
                 <th>Membership Plan</th>
                 <th>Paymnet Slip</th>
-                <th>Verifications</th>
+               
               </tr>
             </thead>
             <tbody>
@@ -467,7 +466,6 @@ if (!isset($_SESSION['Password'])) {
        echo "<td>" . $row['age'] . "</td>";
        echo "<td>" . $row['membership_plan'] . "</td>";
        echo '<td><button onclick="ViewPaymnetSlipAfterV(\'' . $row['user_id'] . '\')">View</button></td>';
-       echo '<td><button onclick="UnVerification(\'' . $row['user_id'] . '\') style="background-color: yellow; color: black;"">Unverified</button></td>';
        echo "</tr>";
       }
     } else {
@@ -492,26 +490,43 @@ if (!isset($_SESSION['Password'])) {
                 <th>Name</th>
                 <th>Email</th>
                 <th>NIC</th>
+                <th>Gender</th>
                 <th>Phone Number</th>
-
                 <th>Age</th>
-                <th>Membership Plan</th>
                 <th>Delete</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Payed</td>
-                <td>Payed</td>
-                <td>Payed</td>
-                <td>Payed</td>
-                <td>Payed</td>
+            <?php
+    
+             $sql = "SELECT user_id, email, user_name, NIC, gender, p_number, age, membership_plan 
+                     FROM users 
+                     WHERE membership_status = 0 AND payment_slip = 'null'";
+            $result = $conn->query($sql);
 
-                <td>Payed</td>
-                <td>Payed</td>
-                <td><button onclick="Delete(userID)" style="background-color: red;">Delete</button></td>
-              </tr>
+
+           if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                echo "<tr>";
+                echo "<td>" . $row['user_id'] . "</td>";
+                echo "<td>" . $row['user_name'] . "</td>";
+                echo "<td>" . $row['email'] . "</td>";
+                echo "<td>" . $row['NIC'] . "</td>";
+                echo "<td>" . $row['gender'] . "</td>";
+                echo "<td>" . $row['p_number'] . "</td>";
+                echo "<td>" . $row['age'] . "</td>";
+               
+                echo '<td><button onclick="DeleteUser(\'' . $row['user_id'] . '\')" style="background-color: red;">Delete</button></td>';
+                echo "</tr>";
+              }
+           } else {
+           echo "<tr><td colspan='8'>No active members found</td></tr>";
+          }
+
+
+        ?>
             </tbody>
+            
           </table>
         </div>
       </section>

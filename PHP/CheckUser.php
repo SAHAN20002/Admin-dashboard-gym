@@ -8,7 +8,7 @@ if (!isset($_SESSION['admin_Id'])) {
 $useremailVerificationStatus = 0;
 $userMembershipStatusDisplay = "No";
 $userInstructorStatusDisply = "No";
-
+$unsernotfoundmsg = "Enter the NIC to search the user";
     $userId = "null";
     $useremailVerificationStatus = "null";
     $username_1 = "null";
@@ -82,25 +82,12 @@ if (isset($_GET['cancel']) && $_GET['cancel'] === 'true') {
     // You can now use $user['column_name'] to display user information
   } else {
     // echo '<h3 style="text-align:center">No user in database</h3>';
+    
   }
+  $unsernotfoundmsg = "No user found";
 }
 
-if(isset($_POST['cansel'])){
-  $userId = "null";
-  $useremailVerificationStatus = "null";
-  $username_1 = "null";
-  $useremail = "null";
-  $usernic = "null";
-  $userGendr = "null";
-  $userpaymnetSlipPhoto = "null";
-  $userInstructorSlup = "null";
-  $userMembershipStatus = "null";
-  $userInstructorStatus = "null";
-  $userPhonenumber = "null";
-  $userAge = "null";
-  $membership = "null";
-  $instrcutor = "null";
-}
+
 
 
 ?>
@@ -349,7 +336,7 @@ if(isset($_POST['cansel'])){
       </div>
       ';
       }else{
-        echo '<h3 style="text-align:center">No user in database</h3>';
+        echo '<h3 style="text-align:center">'.$unsernotfoundmsg.'</h3>';
       }
       
       ?>
