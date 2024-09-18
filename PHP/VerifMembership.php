@@ -1,9 +1,12 @@
 <?php
 
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 include 'phpcon.php';
 
 session_start();
-if (!isset($_SESSION['admin_Id'])) {
+if (!isset($_SESSION['Password'])) {
   header('location:index.php');
 }
 
@@ -27,7 +30,7 @@ if (!isset($_SESSION['admin_Id'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Include Flatpickr CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
+   <script>window.history.replaceState(null, null, window.location.href);</script>
   <!-- Include Flatpickr JS -->
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
@@ -394,7 +397,7 @@ if (!isset($_SESSION['admin_Id'])) {
                   echo "</tr>";
                  }
                } else {
-              echo "<tr><td colspan='8'>No active members found</td></tr>";
+              echo "<tr><td colspan='9'>No active members found</td></tr>";
               }
 
 

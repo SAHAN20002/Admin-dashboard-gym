@@ -11,6 +11,7 @@ $date_now = date('Y-m-d');
 $pendign_user = 0;
 
 if(isset($_SESSION['admin_Id'])) {
+  unset($_SESSION['Password']);
   $stmt = $conn->prepare("SELECT * FROM admin WHERE admin_Id = ?");
   $stmt->bind_param("s", $_SESSION['admin_Id']);
   $stmt->execute();
@@ -377,6 +378,7 @@ if(isset($_POST['logout'])) {
     <ul class="nav-links">
 
       <li><a href="instructor.html">Instructor Login</a></li>
+      <li><a href="CheckUser.php">Check User</a></li>
       <li><a href="Passwordchek.php">Verifications Membership <span style="color:red; font-size:20px; font-weight:bold"> &nbsp<?php echo $pendign_user ?></span></a></li>
       <li><a href="news.html">Membership Manage</a></li>
       <li><a href="appoinment.html">Online Class Manage</a></li>

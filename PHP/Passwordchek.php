@@ -1,4 +1,7 @@
 <?php
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 include 'phpcon.php';
 session_start();
 
@@ -18,6 +21,7 @@ if (!isset($_SESSION['admin_Id'])) {
             $row = $result->fetch_assoc();
             if ($password === $row['Password']) {
                 echo "<script>alert('Password is correct');</script>";
+                $_SESSION['Password'] = $row['Password'];
                 header('location:VerifMembership.php');
             }else{
                 echo "<script>alert('Password is incorrect');</script>";

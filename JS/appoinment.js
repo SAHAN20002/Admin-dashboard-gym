@@ -1,8 +1,13 @@
 setTimeout(function(){
-  window.location.href = "Passwordchek.php"; // Replace with your target page
+  window.location.href = "Passwordchek.php"; 
 }, 18000000);
 
 
+
+window.history.pushState(null, null, window.location.href);
+window.onpopstate = function () {
+    window.history.go(0);
+};
 
 function ViewPaymentSlip(userId) {
   // document.getElementById('paymentSlip').style.display = 'block';
