@@ -1,5 +1,7 @@
 <?php 
+include 'mailsend.php';
 include 'phpcon.php';
+$Date = date('Y-m-d');
 session_start();
 if (!isset($_SESSION['admin_Id'])) {
   header('location:index.php');
@@ -8,6 +10,8 @@ if (!isset($_SESSION['admin_Id'])) {
 $useremailVerificationStatus = 0;
 $userMembershipStatusDisplay = "No";
 $userInstructorStatusDisply = "No";
+$userMembershipStatusPlanDisplay='<h3 style="margin-top: -12px; color:red">No Paymnet Slip</h3>';
+$useerInstructorStatusPlanDisplay= '<h3 style="margin-top: -12px; color:red">No Paymnet Slip</h3>';
 $unsernotfoundmsg = "Enter the NIC to search the user";
     $userId = "null";
     $useremailVerificationStatus = "null";
@@ -23,6 +27,7 @@ $unsernotfoundmsg = "Enter the NIC to search the user";
     $userAge = "null";
     $membership = "null";
     $instrcutor = "null";
+    $instrcutorCost = "0";
 
 if (isset($_GET['cancel']) && $_GET['cancel'] === 'true') {
     $userId = "null";
@@ -63,6 +68,52 @@ if (isset($_GET['cancel']) && $_GET['cancel'] === 'true') {
     $userAge = $user['age'];
     $membership = $user['membership_plan'];
     $instrcutor = $user['instructor'];
+
+    $chekmembershipquery = "SELECT * FROM membership_user WHERE user_id = ?";
+    $stmtMembership = $conn->prepare($chekmembershipquery);
+    $stmtMembership->bind_param("s", $userId);
+    $stmtMembership->execute();
+    $resultMembership = $stmtMembership->get_result();
+
+    if (mysqli_num_rows($resultMembership) > 0) {
+      $membershipData = mysqli_fetch_assoc($resultMembership);
+      $PayAmount = $membershipData['cost'];
+      $satrtDate = $membershipData['start_date'];
+      $endDate = $membershipData['end_date'];
+
+      if ($Date > $endDate) {
+        $userMembershipStatusPlanDisplay = '  <h3 style="margin-top: -12px; color:red">Expried</h3>';
+      } else {
+        if($userMembershipStatus == '1'){
+        $userMembershipStatusPlanDisplay = '<h3 style="margin-top: -12px; color:green">Active</h3>';
+        }else{
+          $userMembershipStatusPlanDisplay = '<h3 style="margin-top: -12px; color:yellow">Not Active</h3>';
+        }
+      }
+    }
+
+    $chekInstructorquery = "SELECT * FROM instructor_user WHERE user_Id = ?";
+    $stmtInstructor = $conn->prepare($chekInstructorquery);
+    $stmtInstructor->bind_param("s", $userId);
+    $stmtInstructor->execute();
+    $resultInstructor = $stmtInstructor->get_result();
+
+    if(mysqli_num_rows($resultInstructor) > 0){
+      $instructorData = mysqli_fetch_assoc($resultInstructor);
+      $instrcutorCost = $instructorData['cost'];
+      $instrcutorStartDate = $instructorData['s_date'];
+      $instrcutorEndDate = $instructorData['e_date'];
+    
+      if ($Date > $instrcutorEndDate) {
+        $useerInstructorStatusPlanDisplay = '  <h3 style="margin-top: -12px; color:red">Expried</h3>';
+      } else {
+        if($userInstructorStatus == '1'){
+          $useerInstructorStatusPlanDisplay = '<h3 style="margin-top: -12px; color:green">Active</h3>';
+        }else{
+          $useerInstructorStatusPlanDisplay = '<h3 style="margin-top: -12px; color:yellow">Not Active</h3>';
+        }
+      }
+    }
     
     if ($userMembershipStatus == '1') {
       $userMembershipStatusDisplay = "success";
@@ -318,18 +369,23 @@ if (isset($_GET['cancel']) && $_GET['cancel'] === 'true') {
             <h3>NIC : '.$usernic.'</h3>
             <h3>Phone number : '.$userPhonenumber.'</h3>
             <h3>Gender : '.$userGendr.'</h3>
-            <h3>Membership Status : '.$userMembershipStatusDisplay.'</h3>
+            
+            <h3>Start Data : '.$satrtDate.'</h3>
+            <h3>End Data : '.$endDate.'</h3>
             <h3>Membership : '.$membership.'</h3>
+            <h3>Cost :Rs : '.$PayAmount.'.00</h3>
             <h3>Instrcutors : '.$instrcutor.'</h3>
-            <h3>Instrcutors Status : '.$userInstructorStatusDisply.'</h3>
+            <h3>Instrcutors Cost :Rs : '.$instrcutorCost.'.00</h3>
           </div>
         </div>
         <div class="show_info_inner_2">
           <h3>Membership Paymnet Slip</h3>
+          <h4 style="margin-top: -12px;">'.$userMembershipStatusPlanDisplay.'</h4>
           <img style="width: 90%; height: 90%; border: 1px solid white; border-radius: 20px;" src="'.$userpaymnetSlipPhoto.'" alt="">
         </div>
         <div class="show_info_inner_3">
           <h3>Instrcutors Paymnet Slip</h3>
+          <h4 style="margin-top: -12px;">'.$useerInstructorStatusPlanDisplay.'</h4>
           <img style="width: 90%; height: 90%; border: 1px solid white; border-radius: 20px;" src="'.$userInstructorSlup.'" alt="">
         </div>
 
