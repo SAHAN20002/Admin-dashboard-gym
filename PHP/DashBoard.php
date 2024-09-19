@@ -553,6 +553,7 @@ if(isset($_POST['logout'])) {
 
 
            if ($result->num_rows > 0) {
+            
              while($row = $result->fetch_assoc()) {
                  echo "<tr>";
                  echo "<td>" . $row['user_id'] . "</td>";
