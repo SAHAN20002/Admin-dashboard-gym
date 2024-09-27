@@ -39,7 +39,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
       $row = $result->fetch_assoc();
       $_SESSION['NIC'] = $row['NIC'];
-      $_SESSION['user_Id'] = $row['Instrutor_ID	'];
+      $_SESSION['Instrutor_ID'] = $row['Instrutor_ID'];
       $_SESSION['user_name'] = $row['user_name'];
           
       header('Location: instructor.php');

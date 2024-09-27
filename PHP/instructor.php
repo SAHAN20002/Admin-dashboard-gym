@@ -2,10 +2,10 @@
 include 'phpcon.php';
 session_start();
 
-if(!isset($_SESSION['user_Id'] )){
-  // header('Location: ../index.php');
+if(!isset($_SESSION['NIC'] )){
+ header('Location: index.php');
 }else{
-  $instructorId = $_SESSION['user_Id'];
+  $instructorId = $_SESSION['Instrutor_ID'];
   $total_user = "0";
   $pending_user = "0";
   $verfication_user = "0";
@@ -551,6 +551,7 @@ if(!isset($_SESSION['user_Id'] )){
         <div class="card">
           <h3>Revenue</h3>
           <h4 style="color: green;">$<?php echo $total_income ?></h4>
+          <h4 style="color: green;">$<?php echo $instructorId ?></h4>
         </div>
         <!-- Add more cards -->
       </div>
