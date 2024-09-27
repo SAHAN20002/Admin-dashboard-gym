@@ -10,9 +10,37 @@ if(!isset($_SESSION['NIC'] )){
   $pending_user = "0";
   $verfication_user = "0";
   $total_income = "0";
+  
+  $totalUserquery = "SELECT COUNT(*) AS total_users FROM users WHERE Instrutor_ID = '$instructorId'";
+  $result = mysqli_query($conn, $totalUserquery);
+  if ($result) {
+    $row = mysqli_fetch_assoc($result);
+    $total_user = $row['total_users'];
+  }
 
+  $pendingUserQuery = "SELECT COUNT(*) AS pending_users FROM users WHERE Instrutor_ID = '$instructorId' AND status = 'pending'";
+  $result = mysqli_query($conn, $pendingUserQuery);
+  if ($result) {
+    $row = mysqli_fetch_assoc($result);
+    $pending_user = $row['pending_users'];
+  }
+
+  $verifiedUserQuery = "SELECT COUNT(*) AS verified_users FROM users WHERE Instrutor_ID = '$instructorId' AND status = 'verified'";
+  $result = mysqli_query($conn, $verifiedUserQuery);
+  if ($result) {
+    $row = mysqli_fetch_assoc($result);
+    $verfication_user = $row['verified_users'];
+  }
+
+  $totalIncomeQuery = "SELECT SUM(amount) AS total_income FROM payments WHERE Instrutor_ID = '$instructorId'";
+  $result = mysqli_query($conn, $totalIncomeQuery);
+  if ($result) {
+    $row = mysqli_fetch_assoc($result);
+    $total_income = $row['total_income'];
+  }
 
 }
+
 ?>
 
 
@@ -502,7 +530,7 @@ if(!isset($_SESSION['NIC'] )){
 
 
         <div class="profile">
-          <img src="IMG/gym copy.png" alt="User Profile">
+          <img src="../IMG/gym copy.png" alt="User Profile">
         </div>
   </div>
   </nav>
@@ -511,7 +539,7 @@ if(!isset($_SESSION['NIC'] )){
   <div class="cover-photo">
     <div class="profile-info">
       <div class="profile-pic">
-        <img src="IMG/1.JPEG" alt="Meryl Streep">
+        <img src="../IMG/1.JPEG" alt="Meryl Streep">
       </div>
       <div class="profile-details">
         <h2>Isuru Madushanka</h2>
@@ -551,7 +579,7 @@ if(!isset($_SESSION['NIC'] )){
         <div class="card">
           <h3>Revenue</h3>
           <h4 style="color: green;">$<?php echo $total_income ?></h4>
-          <h4 style="color: green;">$<?php echo $instructorId ?></h4>
+         
         </div>
         <!-- Add more cards -->
       </div>
