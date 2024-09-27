@@ -1,3 +1,22 @@
+<?php
+include 'phpcon.php';
+session_start();
+
+if(!isset($_SESSION['user_Id'] )){
+  // header('Location: ../index.php');
+}else{
+  $instructorId = $_SESSION['user_Id'];
+  $total_user = "0";
+  $pending_user = "0";
+  $verfication_user = "0";
+  $total_income = "0";
+
+
+}
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -18,7 +37,7 @@
 
     body {
       background-color: #003a70;
-      background-image: url(IMG/ins1.jpg);
+      background-image: url(../IMG/ins1.jpg);
       background-size: cover;
 
     }
@@ -207,7 +226,7 @@
 
     body {
 
-      background-image: url(IMG/user2.jpg);
+      background-image: url(../IMG/user2.jpg);
       background-size: cover;
 
     }
@@ -519,19 +538,19 @@
       <div class="dashboard-cards">
         <div class="card">
           <h3>Total Users</h3>
-          <h4>5</h4>
+          <h4><?php echo $total_user ?></h4>
         </div>
         <div class="card">
           <h3>Pending User</h3>
-          <h4 style="color: red;">3</h4>
+          <h4 style="color: red;"><?php echo $pending_user ?></h4>
         </div>
         <div class="card">
           <h3>Verified user </h3>
-          <h4>5</h4>
+          <h4><?php echo $verfication_user ?></h4>
         </div>
         <div class="card">
           <h3>Revenue</h3>
-          <h4 style="color: green;">$12,345</h4>
+          <h4 style="color: green;">$<?php echo $total_income ?></h4>
         </div>
         <!-- Add more cards -->
       </div>

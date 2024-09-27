@@ -42,7 +42,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
       $_SESSION['user_Id'] = $row['Instrutor_ID	'];
       $_SESSION['user_name'] = $row['user_name'];
           
-      header('Location: ../instructor.html');
+      header('Location: instructor.php');
     } else {
       echo "<script>
       document.addEventListener('DOMContentLoaded', function() {
