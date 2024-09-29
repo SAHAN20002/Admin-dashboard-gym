@@ -1,3 +1,54 @@
+<?php
+include 'phpcon.php';
+session_start();
+if (!isset($_SESSION['NIC'])) {
+  header('location:login.php');
+}
+$userNic = $_SESSION['NIC'];
+
+$sql = "SELECT * FROM instrutor WHERE NIC ='$userNic'";
+$result = $conn->query($sql);
+$row = $result->fetch_assoc();
+
+
+  $instructorName = $row['user_name'];
+  $instructorNIC = $row['NIC'];
+  $instructorAge = $row['age'];
+  $instructorEmail = $row['email'];
+  $instructorContact = $row['p_number'];
+  $instructorID = $row['Instrutor_ID'];
+  $instructorDescription = $row['description'];
+
+ if(isset($_POST['update'])){
+    $name = isset($_POST['name']) ? $_POST['name'] : '';
+    $age = isset($_POST['age']) ? $_POST['age'] : '';
+    $email = isset($_POST['email']) ? $_POST['email'] : '';
+    $contact = isset($_POST['contact']) ? $_POST['contact'] : '';
+    $description = isset($_POST['description']) ? $_POST['description'] : '';
+
+    $sql = "UPDATE instrutor SET user_name='$name', age='$age', email='$email', p_number='$contact', description='$description' WHERE NIC='$userNic'";
+    if ($conn->query($sql) === TRUE) {
+      echo 'success';
+    } else {
+      echo 'error';
+    }
+    $conn->close();
+ }
+
+
+?>
+
+
+
+
+
+
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -218,42 +269,51 @@
 
     <!-- Logo Image -->
     <div class="logo-container">
-      <img id="logo" src="IMG/gym copy.png" alt="Logo">
+      <img id="logo" src="../IMG/gym copy.png" alt="Logo">
     </div>
 
     <main>
       <section class="user-profile">
         <div class="profile-header">
           <div class="profile-image">
-            <img id="profile-picture" src="IMG/user.jpg" alt="User Profile Picture">
+            <img id="profile-picture" src="../IMG/user.jpg" alt="User Profile Picture">
             <input type="file" id="profile-input" style="display: none;" accept="image/*">
           </div>
           <div class="profile-info">
-            <h2 id="username">Isuru Madushanka</h2>
-            <p>User ID: <span id="user-id">12345</span></p>
+            <h2 id="username"><?php echo $instructorName?></h2>
+            <p>User ID: <span id="user-id"><?php echo $instructorID?></span></p>
+            <p>User NIC: <span id="user-id"><?php echo $instructorNIC?></span></p>
           </div>
         </div>
 
         <!-- Personal Details -->
         <div class="profile-details">
           <h3>Profile Information</h3>
-
+          
           <div class="info-row">
-            <label for="address">Address:</label>
-            <input type="text" id="address" value="lorem ipsum ammata siri wela " disabled>
+            <label for="Username">User Name:</label>
+            <input type="text" id="Username" value="<?php echo $instructorName ?> " disabled>
           </div>
           <div class="info-row">
             <label for="email">Email:</label>
-            <input type="email" id="email" value="chamika@gmail.com" disabled>
+            <input type="email" id="email" value="<?php echo $instructorEmail ?>" disabled>
           </div>
           <div class="info-row">
             <label for="contact">Contact No:</label>
-            <input type="text" id="contact" value="125469873" disabled>
+            <input type="text" id="contact" value="<?php echo $instructorContact ?>" disabled>
+          </div>
+          <div class="info-row">
+            <label for="Age">Age:</label>
+            <input type="text" id="Age" value="<?php echo $instructorAge ?>" disabled>
+          </div>
+          <div class="info-row">
+            <label for="Description">Description:</label>
+            <input type="text" id="Description" value="<?php echo $instructorDescription ?>" disabled>
           </div>
         </div>
 
         <!-- Bank Details Section -->
-        <div class="bank-details">
+        <!-- <div class="bank-details">
           <h3>Bank Information</h3>
 
           <div class="info-row">
@@ -268,7 +328,7 @@
             <label for="routing-number">Routing Number:</label>
             <input type="text" id="routing-number" value="987654321" disabled>
           </div>
-        </div>
+        </div> -->
 
         <div class="profile-actions">
           <button id="edit-profile">Edit Profile</button>
@@ -278,6 +338,20 @@
     </main>
   </div>
   <script>
+
+      let instructorName = "<?php echo $instructorName ?>";
+      let instructorAge = "<?php echo $instructorAge ?>";
+      let instructorEmail = "<?php echo $instructorEmail ?>";
+      let instructorContact = "<?php echo $instructorContact ?>";
+      let instructorDescription = "<?php echo $instructorDescription ?>";
+
+    let E_instructorName = document.getElementById('Username');
+    let E_instructorAge = document.getElementById('Age');
+    let E_instructorEmail = document.getElementById('email');
+    let E_instructorContact = document.getElementById('contact');
+    let E_instructorDescription = document.getElementById('Description');
+
+
     // Selecting the DOM elements
     const editButton = document.getElementById('edit-profile');
     const saveButton = document.getElementById('save-profile');
@@ -293,24 +367,25 @@
       });
       editButton.style.display = 'none';
       saveButton.style.display = 'inline-block';
+      alert(instructorName);
 
       // Enable profile picture click to upload
-      profilePicture.addEventListener('click', function () {
-        profileInput.click();
-      });
+      // profilePicture.addEventListener('click', function () {
+      //   profileInput.click();
+      // });
     });
 
     // Handle profile photo change
-    profileInput.addEventListener('change', function (event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          profilePicture.src = e.target.result; // Update profile picture
-        };
-        reader.readAsDataURL(file);
-      }
-    });
+    //  profileInput.addEventListener('change', function (event) {
+    //    const file = event.target.files[0];
+    //    if (file) {
+    //      const reader = new FileReader();
+    //      reader.onload = function (e) {
+    //        profilePicture.src = e.target.result; // Update profile picture
+    //      };
+    //      reader.readAsDataURL(file);
+    //    }
+    //  });
 
     // Save profile changes
     saveButton.addEventListener('click', function () {
@@ -319,10 +394,52 @@
       });
       editButton.style.display = 'inline-block';
       saveButton.style.display = 'none';
-      alert('Profile saved successfully!');
-    });
 
+      let updatedName = E_instructorName.value.trim();
+      let updatedAge = E_instructorAge.value.trim();
+      let updatedEmail = E_instructorEmail.value.trim();
+      let updatedContact = E_instructorContact.value.trim();
+      let updatedDescription = E_instructorDescription.value.trim();
 
+      if (
+        (updatedName && updatedName !== instructorName) ||
+        (updatedAge && updatedAge !== instructorAge) ||
+        (updatedEmail && updatedEmail !== instructorEmail) ||
+        (updatedContact && updatedContact !== instructorContact) ||
+        (updatedDescription && updatedDescription !== instructorDescription)
+      ) {
+        let formData = new FormData();
+
+        formData.append('name', updatedName);
+        formData.append('age', updatedAge);
+        formData.append('email', updatedEmail);
+        formData.append('contact', updatedContact);
+        formData.append('description', updatedDescription);
+        formData.append('update', 'update');
+
+        fetch('user.php', {
+          method: 'POST',
+          body: formData
+        }).then(response => response.text())
+          .then(data => {
+            if (data.includes('success')) {
+              window.location.reload();
+              alert('Profile updated successfully');
+              instructorName = updatedName;
+              instructorAge = updatedAge;
+              instructorEmail = updatedEmail;
+              instructorContact = updatedContact;
+              instructorDescription = updatedDescription;
+            } else {
+              alert('Failed to update the profile');
+            }
+          }).catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the profile');
+          });
+
+        }
+      });
   </script>
 </body>
 

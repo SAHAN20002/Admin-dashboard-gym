@@ -5,9 +5,11 @@ session_start();
 if(!isset($_SESSION['NIC'] )){
  header('Location: index.php');
 }else{
+
+
   $instructorId = $_SESSION['Instrutor_ID'];
-  $total_user = "0";
-  $pending_user = "0";
+  $total_user = "N/A";
+  $pending_user = "N/A";
   $verfication_user = "0";
   $total_income = "0";
   
@@ -15,14 +17,18 @@ if(!isset($_SESSION['NIC'] )){
   $result = mysqli_query($conn, $totalUserquery);
   if ($result) {
     $row = mysqli_fetch_assoc($result);
-    $total_user = $row['total_users'];
+     $total_user = $row['total_users'];
+  }else{
+    $total_user = "N/A";
   }
 
-  $pendingUserQuery = "SELECT COUNT(*) AS pending_users FROM users WHERE instructor = '$instructorId' AND instructor_pyamnet_slip IS NOT NULL AND instructor_status = '0'";
+  $pendingUserQuery = "SELECT COUNT(*) AS pending_users FROM users WHERE instructor = '$instructorId' AND instructor_pyamnet_slip != 'null' AND instructor_status = '0'";
   $result = mysqli_query($conn, $pendingUserQuery);
   if ($result) {
     $row = mysqli_fetch_assoc($result);
     $pending_user = $row['pending_users'];
+  }else{
+    $pending_user = "N/A";
   }
 
   $verifiedUserQuery = "SELECT COUNT(*) AS verified_users FROM users WHERE instructor = '$instructorId' AND instructor_status = '1'";
@@ -32,12 +38,27 @@ if(!isset($_SESSION['NIC'] )){
     $verfication_user = $row['verified_users'];
   }
 
-  // $totalIncomeQuery = "SELECT SUM(amount) AS total_income FROM payments WHERE Instrutor_ID = '$instructorId'";
-  // $result = mysqli_query($conn, $totalIncomeQuery);
-  // if ($result) {
-  //   $row = mysqli_fetch_assoc($result);
-  //   $total_income = $row['total_income'];
-  // }
+   $totalIncomeQuery = "SELECT SUM(m.cost) AS total_revenue
+                        FROM instructor_user AS m
+                        JOIN users AS u ON m.user_Id = u.user_id
+                        WHERE m.e_date >= CURDATE() 
+                        AND u.instructor_status = 1;
+                        ";  
+   $result = mysqli_query($conn, $totalIncomeQuery);
+   if ($result) {
+     $row = mysqli_fetch_assoc($result);
+     $total_income = $row['total_revenue'];
+   }
+
+   $instructorNameQuery = "SELECT * FROM instrutor WHERE Instrutor_ID = '$instructorId'";
+   $result = mysqli_query($conn, $instructorNameQuery);
+    if ($result) {
+      $row = mysqli_fetch_assoc($result);
+      $instructorName = $row['user_name'];
+    }else{
+      $instructorName = "N/A";
+    }
+
 
 }
 
@@ -542,7 +563,7 @@ if(!isset($_SESSION['NIC'] )){
         <img src="../IMG/1.JPEG" alt="Meryl Streep">
       </div>
       <div class="profile-details">
-        <h2>Isuru Madushanka</h2>
+        <h2><?php echo $instructorName ?></h2>
         <p>Fitness Zone | Panadura,Sri Lanka | 076 914 5792</p>
         <input type="button" id="Logout" value="Logout"
           style="width: 150px; height: 30px; margin-top: 10px; font-size: 20px; background-color: yellow; font-weight: bold; cursor: pointer; border: none; border-radius: 5px;">
@@ -554,7 +575,7 @@ if(!isset($_SESSION['NIC'] )){
   <div class="dashboard-main">
     <nav class="tabs">
       <!-- <button id="back-button" onclick="window.history.back()">Back</button> -->
-      <a href="user.html" class="tab">Profile</a>
+      <a href="user.php" class="tab">Profile</a>
       <a href="appoinment.html" class="tab">Appoinments</a>
       <a href="class.html" class="tab">User Verified</a>
 
@@ -578,7 +599,7 @@ if(!isset($_SESSION['NIC'] )){
         </div>
         <div class="card">
           <h3>Revenue</h3>
-          <h4 style="color: green;">$<?php echo $total_income ?></h4>
+          <h4 style="color: green;">$<?php echo $total_income ?>.00</h4>
          
         </div>
         <!-- Add more cards -->
@@ -603,7 +624,7 @@ if(!isset($_SESSION['NIC'] )){
       if (confirm('Are you sure you want to log out?')) {
         let formData = new FormData();
         formData.append('logout', 'logout');
-        fetch('DashBoard.php', {
+        fetch('instructor.php', {
           method: 'POST',
           body: formData
         })

@@ -6,6 +6,7 @@ const profilePicture = document.getElementById('profile-picture');
 const profileInput = document.getElementById('profile-input');
 const inputs = document.querySelectorAll('.profile-details input');
 
+let I_name = document.getElementById('name').innerText;
 // Enable edit mode
 editButton.addEventListener('click', function() {
   inputs.forEach(input => {
