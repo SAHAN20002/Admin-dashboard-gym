@@ -58,7 +58,12 @@ if(!isset($_SESSION['NIC'] )){
     }else{
       $instructorName = "N/A";
     }
-
+    
+    if(isset($_POST['logout'])) {
+      session_destroy();
+      echo json_encode(array('success' => true));
+      exit();
+    }
 
 }
 
@@ -576,8 +581,8 @@ if(!isset($_SESSION['NIC'] )){
     <nav class="tabs">
       <!-- <button id="back-button" onclick="window.history.back()">Back</button> -->
       <a href="user.php" class="tab">Profile</a>
-      <a href="appoinment.html" class="tab">Appoinments</a>
-      <a href="class.html" class="tab">User Verified</a>
+      <a href="appoinment.html" class="tab">User Verified</a>
+      <a href="In_chekUser.php" class="tab">Check user </a>
 
     </nav>
 
