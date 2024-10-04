@@ -176,41 +176,6 @@ if(isset($_POST['logout'])) {
   exit();
 }
 
-// $sql_revenue = "
-//   SELECT 
-//     m.membership_type,
-//     SUM(m.cost) AS total_revenue,
-//     SUM(CASE 
-//         WHEN m.end_date >= DATE_SUB(CURDATE(), INTERVAL 1 WEEK) 
-//         THEN m.cost 
-//         ELSE 0 
-//       END) AS weekly_revenue,
-//     SUM(CASE 
-//         WHEN m.end_date >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) 
-//         THEN m.cost 
-//         ELSE 0 
-//       END) AS monthly_revenue,
-//     SUM(CASE 
-//         WHEN m.end_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR) 
-//         THEN m.cost 
-//         ELSE 0 
-//       END) AS yearly_revenue
-//   FROM membership_user AS m
-//   JOIN users AS u ON m.user_id = u.user_id
-//   WHERE m.end_date >= CURDATE() 
-//   AND u.membership_status = 1
-//   GROUP BY m.membership_type;
-// ";
-// $result_revenue = $conn->query($sql_revenue);
-// if ($result_revenue->num_rows > 0) {
-//   $row = $result_revenue->fetch_assoc();
-//   $revenue = $row['total_revenue'];
-//   $Week_revenue = $row['weekly_revenue'];
-//   $Month_revenue = $row['monthly_revenue'];
-//   $Year_revenue = $row['yearly_revenue'];
-// } else {
-//   $revenue = "N/A";
-// }
 
 
 ?>
