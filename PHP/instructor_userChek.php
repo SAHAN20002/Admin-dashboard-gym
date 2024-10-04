@@ -7,6 +7,12 @@ include 'phpcon.php';
 
 session_start();
 $ins_id = $_SESSION['Instrutor_ID'];
+if(!isset($_SESSION['Instrutor_ID'])){
+  header('location:index.php');
+  exit();
+}else{
+    $ins_id = $_SESSION['Instrutor_ID'];
+}
 
 
 
@@ -305,7 +311,7 @@ $ins_id = $_SESSION['Instrutor_ID'];
       outline-offset: 2px;
     }
   </style>
-  <script defer src="../JS/appoinment.js"></script>
+  <script defer src="../JS/instructorUserChek.js"></script>
 </head>
 
 <body>
