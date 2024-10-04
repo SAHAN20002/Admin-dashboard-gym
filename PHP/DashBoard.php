@@ -7,6 +7,10 @@ session_start();
 include 'phpcon.php';
 $date = date('Y-m-d H:i:s');
 $date_now = date('Y-m-d');
+$Week_revenue = 0;
+$Month_revenue = 0;
+$Year_revenue = 0;
+$revenue = 0;
 
 $pendign_user = 0;
 
@@ -36,6 +40,44 @@ if ($result->num_rows > 0) {
   $totalUser = $row['total_users'];
 } else {
   $totalUser = "N/A";
+}
+
+$sql_w = "SELECT COUNT(*) AS total_users_w FROM users WHERE membership_plan = 'Week' AND membership_status = 1";  // Replace your_table_name with the actual table name
+ $result_w = $conn->query($sql_w);
+
+ if ($result_w->num_rows > 0) {
+   $row = $result_w->fetch_assoc();
+   $totalUser_w = $row['total_users_w'];
+ } else {
+   $totalUser_w = "N/A";
+ }
+ $sql_m = "SELECT COUNT(*) AS total_users_m FROM users WHERE membership_plan = 'Month' AND membership_status = 1";  // Replace your_table_name with the actual table name
+ $result_m = $conn->query($sql_m);
+
+ if ($result_m->num_rows > 0) {
+   $row = $result_m->fetch_assoc();
+   $totalUser_m = $row['total_users_m'];
+ } else {
+   $totalUser_m = "N/A";
+ }
+ $sql_y = "SELECT COUNT(*) AS total_users_y FROM users WHERE membership_plan = 'Year' AND membership_status = 1";  // Replace your_table_name with the actual table name
+ $result_y = $conn->query($sql_y);
+
+ if ($result_y->num_rows > 0) {
+   $row = $result_y->fetch_assoc();
+   $totalUser_y = $row['total_users_y'];
+ } else {
+   $totalUser_m = "N/A";
+ }
+
+$sql_insructor = "SELECT COUNT(*) AS total_Insructor FROM instrutor"; 
+$result_instructor = $conn->query($sql_insructor);
+
+if ($result_instructor->num_rows > 0) {
+  $row = $result_instructor->fetch_assoc();
+  $totalInstructor = $row['total_Insructor'];
+} else {
+  $totalInstructor = "N/A";
 }
 
 $sql_pending_user = "SELECT COUNT(*) AS total_users_pending FROM users WHERE membership_status = 0 AND payment_slip != 'null'";  // Replace your_table_name with the actual table name
@@ -68,25 +110,108 @@ if ($result_I_user->num_rows > 0) {
   $I_user = "N/A";
 }
 
-$sql_revenue = "SELECT SUM(m.cost) AS total_revenue
-                FROM membership_user AS m
-                JOIN users AS u ON m.user_id = u.user_id
-                WHERE m.end_date >= CURDATE() 
-                AND u.membership_status = 1;
-                ";  
-$result_revenue = $conn->query($sql_revenue);
-if ($result_revenue->num_rows > 0) {
-  $row = $result_revenue->fetch_assoc();
-  $revenue = $row['total_revenue'];
-} else {
-  $revenue = "N/A";
-}
+ $sql_revenue = "SELECT SUM(m.cost) AS total_revenue
+                 FROM membership_user AS m
+                 JOIN users AS u ON m.user_id = u.user_id
+                 WHERE m.end_date >= CURDATE() 
+                 AND u.membership_status = 1;
+                 ";  
+                
+ $result_revenue = $conn->query($sql_revenue);
+ if ($result_revenue->num_rows > 0) {
+   $row = $result_revenue->fetch_assoc();
+   $revenue = $row['total_revenue'];
+ } else {
+   $revenue = "N/A";
+ }
+
+ $sql_revenue_w = "SELECT SUM(m.cost) AS total_revenue_w
+                 FROM membership_user AS m
+                 JOIN users AS u ON m.user_id = u.user_id
+                 WHERE m.end_date >= CURDATE() 
+                 AND u.membership_status = 1 AND u.membership_plan = 'Week';
+                 ";  
+                
+ $result_revenue_w = $conn->query($sql_revenue_w);
+ if ($result_revenue_w->num_rows > 0) {
+   $row = $result_revenue_w->fetch_assoc();
+   $Week_revenue = $row['total_revenue_w'];
+ } else {
+  $Week_revenue = "N/A";
+ }
+
+ $sql_revenue_m = "SELECT SUM(m.cost) AS total_revenue_m
+                 FROM membership_user AS m
+                 JOIN users AS u ON m.user_id = u.user_id
+                 WHERE m.end_date >= CURDATE() 
+                 AND u.membership_status = 1 AND u.membership_plan = 'Month';
+                 ";  
+                
+ $result_revenue_m = $conn->query($sql_revenue_m);
+ if ($result_revenue_m->num_rows > 0) {
+   $row = $result_revenue_m->fetch_assoc();
+   $Month_revenue = $row['total_revenue_m'];
+ } else {
+  $Month_revenue = "0";
+ }
+
+ $sql_revenue_y = "SELECT SUM(m.cost) AS total_revenue_y
+                 FROM membership_user AS m
+                 JOIN users AS u ON m.user_id = u.user_id
+                 WHERE m.end_date >= CURDATE() 
+                 AND u.membership_status = 1 AND u.membership_plan = 'Year';
+                 ";  
+                
+ $result_revenue_y = $conn->query($sql_revenue_y);
+ if ($result_revenue_y->num_rows > 0) {
+   $row = $result_revenue_y->fetch_assoc();
+   $Year_revenue = $row['total_revenue_y'];
+ } else {
+  $Year_revenue = "0";
+ }
 
 if(isset($_POST['logout'])) {
   session_destroy();
   echo json_encode(array('success' => true));
   exit();
 }
+
+// $sql_revenue = "
+//   SELECT 
+//     m.membership_type,
+//     SUM(m.cost) AS total_revenue,
+//     SUM(CASE 
+//         WHEN m.end_date >= DATE_SUB(CURDATE(), INTERVAL 1 WEEK) 
+//         THEN m.cost 
+//         ELSE 0 
+//       END) AS weekly_revenue,
+//     SUM(CASE 
+//         WHEN m.end_date >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) 
+//         THEN m.cost 
+//         ELSE 0 
+//       END) AS monthly_revenue,
+//     SUM(CASE 
+//         WHEN m.end_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR) 
+//         THEN m.cost 
+//         ELSE 0 
+//       END) AS yearly_revenue
+//   FROM membership_user AS m
+//   JOIN users AS u ON m.user_id = u.user_id
+//   WHERE m.end_date >= CURDATE() 
+//   AND u.membership_status = 1
+//   GROUP BY m.membership_type;
+// ";
+// $result_revenue = $conn->query($sql_revenue);
+// if ($result_revenue->num_rows > 0) {
+//   $row = $result_revenue->fetch_assoc();
+//   $revenue = $row['total_revenue'];
+//   $Week_revenue = $row['weekly_revenue'];
+//   $Month_revenue = $row['monthly_revenue'];
+//   $Year_revenue = $row['yearly_revenue'];
+// } else {
+//   $revenue = "N/A";
+// }
+
 
 ?>
 
@@ -425,9 +550,13 @@ if(isset($_POST['logout'])) {
         
       </div>
       <div class="card">
-        <h3 style=" text-align:center">Membership have User</h3>
-        <p style="font-weight: bold; font-size:20px; text-align:center;"><?php echo $m_user?></p>
-        
+        <h3 style=" text-align:center;">Membership have User</h3>
+        <div style = "display: flex; align-items: center;justify-content: center;flex-direction: row;">
+        <p style="font-weight: bold; font-size:20px; text-align:center;">Week -  <?php echo $totalUser_w?>  &nbsp   |</p>
+        <p style="font-weight: bold; font-size:20px; text-align:center;">&nbsp  Month - <?php echo $totalUser_m?> &nbsp   |</p>
+        <p style="font-weight: bold; font-size:20px; text-align:center;">&nbsp   Year - <?php echo $totalUser_y?>  &nbsp  |</p>
+        <p style="font-weight: bold; font-size:20px; text-align:center;color:green">&nbsp   Total - <?php echo $m_user?>  &nbsp  </p>
+        </div>
       </div>
       <div class="card">
         <h3 style=" text-align:center">Instructor have User</h3>
@@ -435,7 +564,23 @@ if(isset($_POST['logout'])) {
         
       </div>
       <div class="card">
-        <h3 style=" text-align:center">Revenue</h3>
+        <h3 style=" text-align:center">Instructor count</h3>
+        <p style="font-weight: bold; font-size:20px; text-align:center; "><?php echo $totalInstructor?></p>
+      </div>
+      <div class="card">
+        <h3 style=" text-align:center"> Week Revenue</h3>
+        <p style="font-weight: bold; font-size:20px; text-align:center; color:green">RS :<?php echo $Week_revenue?>.00</p>
+      </div>
+      <div class="card">
+        <h3 style=" text-align:center">Month Revenue</h3>
+        <p style="font-weight: bold; font-size:20px; text-align:center; color:green">RS :<?php echo $Month_revenue?>.00</p>
+      </div>
+      <div class="card">
+        <h3 style=" text-align:center"> Year Revenue</h3>
+        <p style="font-weight: bold; font-size:20px; text-align:center; color:green">RS :<?php echo $Year_revenue?>.00</p>
+      </div>
+      <div class="card">
+        <h3 style=" text-align:center"> Total Revenue</h3>
         <p style="font-weight: bold; font-size:20px; text-align:center; color:green">RS :<?php echo $revenue?>.00</p>
       </div>
       <!-- Add more cards -->
