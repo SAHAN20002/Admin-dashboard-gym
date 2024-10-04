@@ -502,7 +502,7 @@ if(isset($_POST['logout'])) {
     <div class="logo">FITNESS ZONE</div>
     <ul class="nav-links">
 
-      <li><a href="#">Instructor Login</a></li>
+      
       <li><a href="CheckUser.php">Check User</a></li>
       <li><a href="Passwordchek.php">Verifications Membership <span style="color:red; font-size:20px; font-weight:bold"> &nbsp<?php echo $pendign_user ?></span></a></li>
       <li><a href="news.html">Membership Manage</a></li>
