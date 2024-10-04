@@ -353,7 +353,7 @@ if(!isset($_SESSION['Instrutor_ID'])){
       </div>
 
       <section class="appointments" id="div_1">
-        <h2>Pendinng-user</h2>
+        <h2>Pending user</h2>
         <div style="width: auto; height:300px; overflow-y: scroll;">
           <table>
             <thead>
@@ -412,7 +412,7 @@ if(!isset($_SESSION['Instrutor_ID'])){
       </section>
 
       <div id="paymentSlipAfterV"
-        style="display:none;  width: 500px; height: 500px; z-index: 55; position: absolute;  margin-left: 350px;margin-top: 55vh; background-color: aliceblue; border-radius: 20px;">
+        style="display:none;  width: 500px; height: 500px; z-index: 55; position: absolute;  margin-left: 350px;margin-top: 45vh; background-color: aliceblue; border-radius: 20px;">
         <div style="width: 100%; height: 85%;  display: flex; align-items: center; justify-content: center;">
           <img id="userPhotoAV" src="" alt="User Payment Slip"
             style="width: 95%; height: 95%;border: 1px solid black; border-radius: 20px;">
@@ -484,56 +484,7 @@ if(!isset($_SESSION['Instrutor_ID'])){
         </div>
       </section>
 
-      <section class="payment-slips" id="div_3">
-        <h2>Unverified Users</h2>
-        <div style="width: auto; height:300px; overflow-y: scroll;">
-          <table>
-            <thead>
-              <tr>
-                <th>User Id</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>NIC</th>
-                <th>Gender</th>
-                <th>Phone Number</th>
-                <th>Age</th>
-               
-              </tr>
-            </thead>
-            <tbody>
-            <?php
-    
-             $sql = "SELECT user_id, email, user_name, NIC, gender, p_number, age, membership_plan 
-                     FROM users 
-                     WHERE instructor_status = 0 AND instructor_pyamnet_slip = 'null'AND instructor = '$ins_id'";
-            $result = $conn->query($sql);
-
-
-           if ($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                echo "<tr>";
-                echo "<td>" . $row['user_id'] . "</td>";
-                echo "<td>" . $row['user_name'] . "</td>";
-                echo "<td>" . $row['email'] . "</td>";
-                echo "<td>" . $row['NIC'] . "</td>";
-                echo "<td>" . $row['gender'] . "</td>";
-                echo "<td>" . $row['p_number'] . "</td>";
-                echo "<td>" . $row['age'] . "</td>";
-               
-               
-                echo "</tr>";
-              }
-           } else {
-           echo "<tr><td colspan='8'>No active members found</td></tr>";
-          }
-
-
-        ?>
-            </tbody>
-            
-          </table>
-        </div>
-      </section>
+      
 
     </main>
   </div>

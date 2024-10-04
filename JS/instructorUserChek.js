@@ -131,7 +131,7 @@ function deletePhoto(){
        
                          document.getElementById('div_2').style.filter = 'blur(5px)';
                          document.getElementById('div_1').style.filter = 'blur(5px)';
-                         document.getElementById('div_3').style.filter = 'blur(5px)';
+                         
                      } else {
                          alert('No photo available for this user.');
                      }
@@ -144,9 +144,39 @@ function deletePhoto(){
          xhr.send();
        }  
        
+    function UnVerification(){
+        if (!confirm('Are you sure you want to Un-verify this user?')) {
+            return;
+        }
+        let userId = document.getElementById('useridV').innerText;
+        let form = new FormData();
+      form.append('userId', userId);
+      fetch('unverifiedUserInstructor.php', {
+          method: 'POST',
+          body: form
+      }).then(response => response.text())
+          .then(data => {
+              console.log(data);
+              if (data === '{"message":"Membership status updated."}') {
+                  alert('User has been verified successfully.');
+                  document.getElementById('paymentSlip').style.display = 'none';
+                  document.getElementById('body').style.filter = 'blur(0px)';
+                  window.location.reload();
+              } else {
+                  alert('There was an error verifying the user.'+data);
+              }
+          }).catch(error => {
+              console.error('Error verifying user: ', error);
+              alert('There was an error verifying the user.');
+          });
+    }
+
+
+
+
        function CaselAfterV(){
         document.getElementById('paymentSlipAfterV').style.display = 'none';
         document.getElementById('div_1').style.filter = 'blur(0px)';
         document.getElementById('div_2').style.filter = 'blur(0px)';
-        document.getElementById('div_3').style.filter = 'blur(0px)';
+       
       }

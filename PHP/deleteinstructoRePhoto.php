@@ -7,7 +7,7 @@ if(isset($_POST['userId'])){
     $result = $conn->query($sql);
     if($result->num_rows > 0){
         $row = $result->fetch_assoc();
-        $updateSql = "UPDATE users SET instructor_pyamnet_slip = 'null',  WHERE user_id = '$userId'";
+        $updateSql = "UPDATE users SET instructor_pyamnet_slip = 'null', instructor = 'null' WHERE user_id = '$userId'";
            if( $conn->query($updateSql)=== TRUE){
 
                  $deleteSql = "DELETE FROM instructor_user WHERE user_Id = '$userId'";
