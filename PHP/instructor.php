@@ -581,7 +581,8 @@ if(!isset($_SESSION['NIC'] )){
     <nav class="tabs">
       <!-- <button id="back-button" onclick="window.history.back()">Back</button> -->
       <a href="user.php" class="tab">Profile</a>
-      <a href="appoinment.html" class="tab">User Verified</a>
+      <a href="instructorPaswordChk.php" class="tab">User Verified <label style = " color:red"> <?php echo $pending_user ?></lable></a>
+      <a href="#" class="tab">Appoinment</a>
       <a href="In_chekUser.php" class="tab">Check user </a>
 
     </nav>
@@ -604,7 +605,7 @@ if(!isset($_SESSION['NIC'] )){
         </div>
         <div class="card">
           <h3>Revenue</h3>
-          <h4 style="color: green;">$<?php echo $total_income ?>.00</h4>
+          <h4 style="color: green;">Rs : <?php echo $total_income ?>.00</h4>
          
         </div>
         <!-- Add more cards -->
