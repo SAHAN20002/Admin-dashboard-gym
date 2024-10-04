@@ -1,4 +1,27 @@
 <?php
+include 'phpcon.php';
+$instructor_Id = "";
+session_start();
+if(isset($_SESSION['admin_Id'])) {
+
+   $get_instructor_Id = "SELECT * FROM instrutor"; 
+    $result = $conn->query($get_instructor_Id);
+    if($result->num_rows > 0){
+        $row = $result->fetch_assoc();
+        $instructor_Id = $row['Instrutor_ID'];
+        if($instructor_Id == "IN001"){
+            $instructor_Id = "IN002";
+        }else{
+            $instructor_Id = "IN003";
+        }   
+    }else{
+        $instructor_Id = "IN001";
+    }
+
+} else {
+    header('Location: index.php');
+}
+
 // Example: Fetch members from the database
  $members = [ 
      ['id' => 1, 'name' => 'Instructor 1', 'email' => 'instructor1@example.com'], 
@@ -8,7 +31,7 @@
 
 // Limit to 3 members
 $max_members = 3;
-$current_members_count = 3;
+$current_members_count = 2;
 ?>
 
 
@@ -44,7 +67,7 @@ $current_members_count = 3;
         <form method="POST" action="your_backend_script.php">
             <div class="mb-3">
                 <label for="I_ID" class="form-label">Instructor ID</label>
-                <input type="text" class="form-control" id="I_Id" name="Instructor ID" required disabled>
+                <input type="text" class="form-control" id="I_Id" name="Instructor ID" value="<?php echo $instructor_Id?>" required disabled>
             </div>
             <div class="mb-3">
                 <label for="nic" class="form-label">NIC</label>

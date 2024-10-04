@@ -38,11 +38,17 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     if ($result->num_rows > 0) {
 
       $row = $result->fetch_assoc();
+      $V_ststus = $row['email_v_status'];
+      if($V_ststus == null){
+             header('Location: email_v.php');
+      }else{
+        
       $_SESSION['NIC'] = $row['NIC'];
       $_SESSION['Instrutor_ID'] = $row['Instrutor_ID'];
       $_SESSION['user_name'] = $row['user_name'];
           
       header('Location: instructor.php');
+      }
     } else {
       echo "<script>
       document.addEventListener('DOMContentLoaded', function() {
