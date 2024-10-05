@@ -82,7 +82,7 @@ if(!isset($_SESSION['admin_Id'])) {
         <div class="col text-center">
             <label for="dropdown" class="form-label">Select a Plan:</label>
             <select class="form-select w-50 mx-auto" id="dropdown">
-                <option value="plan1" selected>Select one</option>
+                <option value="plan" selected>Select one</option>
                 <option value="P001">P001</option>
                 <option value="P002">P002</option>
                 <option value="P003">P003</option>
@@ -137,8 +137,9 @@ if(!isset($_SESSION['admin_Id'])) {
 <script>
     document.getElementById('dropdown').addEventListener('change', function() {
     let plan = this.value;
+    
 
-    if (plan !== "") {
+    if (plan !== "plan") {
         // AJAX request to get plan details
         fetch('getPlanDetails.php', {
             method: 'POST',
@@ -161,6 +162,9 @@ if(!isset($_SESSION['admin_Id'])) {
         })
         .catch(error => console.error('Error:', error));
     }
+
+
+
 });
 
 </script>
