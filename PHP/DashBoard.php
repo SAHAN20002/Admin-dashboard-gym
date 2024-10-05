@@ -470,7 +470,7 @@ if(isset($_POST['logout'])) {
       
       <li><a href="CheckUser.php">Check User</a></li>
       <li><a href="Passwordchek.php">Verifications Membership <span style="color:red; font-size:20px; font-weight:bold"> &nbsp<?php echo $pendign_user ?></span></a></li>
-      <li><a href="news.html">Membership Manage</a></li>
+      <li><a href="membershipMangemnt.php">Membership Manage</a></li>
       <li><a href="appoinment.html">Online Class Manage</a></li>
       <li><a href="appoinment.html">Instruct Display Manage</a></li>
       <li><a href="#">Report Generator</a></li>
