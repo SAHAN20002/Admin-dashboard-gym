@@ -42,7 +42,8 @@ if(!isset($_SESSION['NIC'] )){
                         FROM instructor_user AS m
                         JOIN users AS u ON m.user_Id = u.user_id
                         WHERE m.e_date >= CURDATE() 
-                        AND u.instructor_status = 1;
+                        AND u.instructor_status = 1
+                        AND u.instructor = '$instructorId';
                         ";  
    $result = mysqli_query($conn, $totalIncomeQuery);
    if ($result) {
@@ -581,7 +582,7 @@ if(!isset($_SESSION['NIC'] )){
     <nav class="tabs">
       <!-- <button id="back-button" onclick="window.history.back()">Back</button> -->
       <a href="user.php" class="tab">Profile</a>
-      <a href="instructorPaswordChk.php" class="tab">User Verified <label style = " color:red"> <?php echo $pending_user ?></lable></a>
+      <a href="instructor_userChek.php" class="tab">User Verified <label style = " color:red"> <?php echo $pending_user ?></lable></a>
       <a href="#" class="tab">Appoinment</a>
       <a href="In_chekUser.php" class="tab">Check user </a>
 

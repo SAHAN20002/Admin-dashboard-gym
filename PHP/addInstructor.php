@@ -1,37 +1,117 @@
 <?php
 include 'phpcon.php';
+include 'mailsend.php';
+include 'imageupload.php';
+
 $instructor_Id = "";
 session_start();
 if(isset($_SESSION['admin_Id'])) {
 
-   $get_instructor_Id = "SELECT * FROM instrutor"; 
+    $get_instructor_Id = "SELECT * FROM instrutor";  // Corrected the table name
     $result = $conn->query($get_instructor_Id);
-    if($result->num_rows > 0){
-        $row = $result->fetch_assoc();
-        $instructor_Id = $row['Instrutor_ID'];
-        if($instructor_Id == "IN001"){
-            $instructor_Id = "IN002";
-        }else{
-            $instructor_Id = "IN003";
-        }   
-    }else{
-        $instructor_Id = "IN001";
+    
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $last_id = $row['Instrutor_ID'];  // Ensure the column name is correct
+        }
+        
+        // Extract the numeric part and increment it
+        $num = (int)substr($last_id, 2);
+        $num++;
+        
+        // Format the new ID
+        $instructor_Id = "IN" . str_pad($num, 3, "0", STR_PAD_LEFT);
+    } else {
+        $instructor_Id = "IN001";  // Default if no rows are found
     }
 
 } else {
     header('Location: index.php');
 }
-
-// Example: Fetch members from the database
- $members = [ 
-     ['id' => 1, 'name' => 'Instructor 1', 'email' => 'instructor1@example.com'], 
-     ['id' => 2, 'name' => 'Instructor 2', 'email' => 'instructor2@example.com'],
-     ['id' => 3, 'name' => 'Instructor 3', 'email' => 'instructor3@example.com']
- ];
-
-// Limit to 3 members
 $max_members = 3;
-$current_members_count = 2;
+$instructorCountQuery = "SELECT COUNT(*) AS count FROM instrutor";
+$result = $conn->query($instructorCountQuery);
+$row = $result->fetch_assoc();
+$current_members_count = isset($row['count']) ? $row['count'] : 0;
+
+
+if ($current_members_count > 0) {
+    $instructorDetailsQuery = "SELECT Instrutor_ID, user_name, email FROM instrutor";
+    $result = $conn->query($instructorDetailsQuery);
+
+    $members = []; 
+    while ($row = $result->fetch_assoc()) {
+        $members[] = [
+            'id' => $row['Instrutor_ID'],
+            'name' => $row['user_name'],
+            'email' => $row['email']
+        ];
+    }
+} else {
+    $members = []; 
+}
+
+if($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $nic = $_POST['nic'];
+    $email = $_POST['email'];
+    $user_name = $_POST['user_name'];
+    $password = $_POST['password'];
+    $c_password = $_POST['c_password'];
+    $p_number = $_POST['p_number'];
+    $description = $_POST['description'];
+    $photo = $_POST['photo'];
+    $age = $_POST['age'];
+    
+
+    $emailQuery = "SELECT * FROM instrutor WHERE email = '$email'";
+    $emailResult = $conn->query($emailQuery);
+    if ($emailResult->num_rows > 0) {
+        echo "<script>alert('Email already exists');</script>";
+    } else {
+        $emailuserchek = "SELECT * FROM users WHERE email = '$email'";
+        $emailuserchekresult = $conn->query($emailuserchek);
+        if ($emailuserchekresult->num_rows > 0) {
+            echo "<script>alert('Email already registered in users');</script>";
+            
+            
+        } else {
+            if ($password == $c_password) {
+             $random_code = rand(1000, 9999);
+             $photo = saveImage($_FILES['photo']);
+             $imagelink = "http://localhost/sahan/ADMIN-MAIN/".$photo;
+
+            $insertQuery = "INSERT INTO instrutor (Instrutor_ID, NIC, email, user_name, Password, p_number, description, photo, age,email_v_code) VALUES ('$instructor_Id', '$nic', '$email', '$user_name', '$password', '$p_number', '$description', '$imagelink', '$age','$random_code')";
+                if ($conn->query($insertQuery) === TRUE) {
+                    $_SESSION['Instrutor_ID'] = $instructor_Id;
+                    $to = $email;
+                    $subject = "Email Verification Code";
+                    $message = "Your email verification code is: $random_code";
+                    $headers = "From:";
+
+                    if(mailsend($to, $subject, $message, $headers)) {
+                        echo "<script>alert('Email sent to verify email.');</script>";
+                        header('Location: email_v.php');
+                    } else {
+                        echo "<script>alert('Failed to send email.');</script>";
+                    }
+
+                   
+                } else {
+                    echo "Error: " . $insertQuery . "<br>" . $conn->error;
+                }
+            } else {
+                echo "<script>alert('Password does not match');</script>";
+            }
+        }
+        
+    }
+
+    
+}
+
+
+
+ 
 ?>
 
 
@@ -64,7 +144,8 @@ $current_members_count = 2;
     <div class="container mt-5">
     <?php if ($current_members_count < $max_members): ?>
         <h2 class="text-center">Insert Insructor</h2>
-        <form method="POST" action="your_backend_script.php">
+        <button class="btn btn-secondary mb-3" onclick="window.history.back();">Back</button>
+        <form method="POST" action="addInstructor.php">
             <div class="mb-3">
                 <label for="I_ID" class="form-label">Instructor ID</label>
                 <input type="text" class="form-control" id="I_Id" name="Instructor ID" value="<?php echo $instructor_Id?>" required disabled>
@@ -87,7 +168,7 @@ $current_members_count = 2;
             </div>
             <div class="mb-3">
                 <label for="c_password" class="form-label">Confirm Password</label>
-                <input type="c_password" class="form-control" id="c_password" name=" Confirm password" required>
+                <input type="password" class="form-control" id="c_password" name="c_password" required>
             </div>
             <div class="mb-3">
                 <label for="p_number" class="form-label">Phone Number</label>
@@ -111,19 +192,21 @@ $current_members_count = 2;
             </div>
             <div class="text-center">
                 <button type="submit" class="btn btn-primary btn-lg mb-3">Submit</button>
+                <button type="reset" class="btn btn-secondary btn-lg mb-3">Reset</button>
             </div>
         </form>
       </div>
       <?php else: ?>
         <div class="card-container">
             <h2 class="text-center">Instructor List (Max 3 Members)</h2>
+            <button class="btn btn-secondary mb-3" onclick="window.history.back();">Back</button>
             <div class="row">
                 <?php foreach ($members as $member): ?>
                 <div class="col-md-4 mb-3">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title"><?= $member['name'] ?></h5>
-                            <p class="card-text"><?= $member['email'] ?></p>
+                            <h5 class="card-title"><?=$member['name'] ?></h5>
+                            <p class="card-text"><?=$member['email'] ?></p>
                             <form method="POST" action="delete_member.php">
                                 <input type="hidden" name="member_id" value="<?= $member['id'] ?>">
                                 <button type="submit" class="btn btn-danger w-100">Delete</button>
