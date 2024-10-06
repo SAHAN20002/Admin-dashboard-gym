@@ -31,7 +31,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(['error' => 'No data found']);
     }
 
+    
+}
+if (isset($_POST['action']) && $_POST['action'] === 'changeStatus') {
+    
+    $updateSql = "UPDATE instrutor SET Chnage_status = false";
+    if ($conn->query($updateSql) === TRUE) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'error' => $conn->error]);
+    }
+}
     $stmt->close();
     $conn->close();
-}
+
 ?>

@@ -4,6 +4,31 @@ session_start();
 if(!isset($_SESSION['admin_Id'])) {
    header('Location: index.php');
 }
+$button = "none";
+$gatherSpread = "none";
+$transition = "none";
+$instructorId = ""; 
+$insructorStatus = "SELECT * FROM instrutor WHERE Chnage_status = true";
+$result = $conn->query($insructorStatus);
+if ($result->num_rows > 0) {
+    $button = "show";
+     while($row = $result->fetch_assoc()) {
+      $instructorId = $row['Instrutor_ID'];
+      $addanimation = "SELECT * FROM instrutor WHERE Chnage_status = true AND Instrutor_ID = '$instructorId'";
+      $result_2 = $conn->query($addanimation);
+
+      if ($result_2->num_rows > 0) {
+    
+        $gatherSpread = "gatherSpread 2s ease-in-out infinite";
+        $transition = "transform 0.3s ease-in-out";
+
+      } else {
+        $gatherSpread = "none";
+        $transition = "none";
+      }
+    }
+}
+
 
 ?>
 
@@ -46,8 +71,8 @@ if(!isset($_SESSION['admin_Id'])) {
    }
 
    .card {
-      animation: gatherSpread 2s ease-in-out infinite; /* 2 seconds per cycle, infinite loop */
-      transition: transform 0.3s ease-in-out;
+      animation:<?php echo $gatherSpread;?>; /* 2 seconds per cycle, infinite loop */
+      transition:<?php echo $transition;?>;
    }
     
     </style>
@@ -56,7 +81,7 @@ if(!isset($_SESSION['admin_Id'])) {
 <div class="container mt-custom">
     <h2 class="text-center">Instructor Management</h2>
     <button class="btn btn-secondary mb-3" onclick="window.history.back();">Back</button>
-    <button class="btn btn-warning mb-3" id="ChnageSataus">mark as done</button>
+    <button class="btn btn-warning mb-3" style="display:<?php echo $button; ?>;" id="ChnageSataus">mark as done</button>
     <hr>
     <div class="row text-center">
 
@@ -65,7 +90,8 @@ if(!isset($_SESSION['admin_Id'])) {
          $resultPlan = $conn->query($sqlPlan);
             if ($resultPlan->num_rows > 0) {
                 while($row = $resultPlan->fetch_assoc()) {
-                    
+
+                   
                            echo'
                              <!-- Card 1 -->
                                <div class="col-md-4 mb-4">
@@ -82,8 +108,9 @@ if(!isset($_SESSION['admin_Id'])) {
                                      </div>
                                   </div>
                                </div>';
-                            }
+                            
                         }
+                    }
        ?> 
 
         <!-- Card 3 -->
@@ -161,28 +188,28 @@ if(!isset($_SESSION['admin_Id'])) {
         .catch(error => console.error('Error:', error));
     }
 
-    document.getElementById('ChnageSataus').addEventListener('click', function() {
-        if (confirm('Are you sure you want to mark this as done?')) {
-            fetch('getInstructordetails.php', {
+});
+document.getElementById('ChnageSataus').addEventListener('click', function() {
+        if (!confirm('Are you sure you want to mark as done?')) {
+            return;
+        }
+        fetch('getInstructordetails.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: 'action=changeStatus',
-            })
-            .then(response => response.json())
-            .then(data => {
+        })
+        .then(response => response.json())
+        .then(data => {
             if (data.success) {
                 alert('Status changed successfully');
             } else {
                 alert('Failed to change status');
             }
-            })
-            .catch(error => console.error('Error:', error));
-        }else{
-            alert('Status not changed');
-        }
-    })
+        })
+        .catch(error => console.error('Error:', error));
+    });
 </script>
 </body>
 </html>
