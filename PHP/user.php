@@ -25,8 +25,10 @@ $row = $result->fetch_assoc();
     $email = isset($_POST['email']) ? $_POST['email'] : '';
     $contact = isset($_POST['contact']) ? $_POST['contact'] : '';
     $description = isset($_POST['description']) ? $_POST['description'] : '';
+    $changeStatus = true;
 
-    $sql = "UPDATE instrutor SET user_name='$name', age='$age', email='$email', p_number='$contact', description='$description' WHERE NIC='$userNic'";
+    $sql = "UPDATE instrutor SET user_name='$name', age='$age', email='$email', p_number='$contact', description='$description', Chnage_status='$changeStatus' WHERE NIC='$userNic'";
+    
     if ($conn->query($sql) === TRUE) {
       echo 'success';
     } else {

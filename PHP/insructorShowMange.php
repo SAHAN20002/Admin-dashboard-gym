@@ -35,6 +35,20 @@ if(!isset($_SESSION['admin_Id'])) {
             max-width: 600px;
             margin: auto;
         }
+        @keyframes gatherSpread {
+           0%, 100% {
+            transform: scale(1); /* Normal size at the start and end */
+            
+           }
+           50% {
+           transform: scale(1.05); /* Slightly larger size (spread) */
+           }
+   }
+
+   .card {
+      animation: gatherSpread 2s ease-in-out infinite; /* 2 seconds per cycle, infinite loop */
+      transition: transform 0.3s ease-in-out;
+   }
     
     </style>
 </head>
@@ -42,6 +56,7 @@ if(!isset($_SESSION['admin_Id'])) {
 <div class="container mt-custom">
     <h2 class="text-center">Instructor Management</h2>
     <button class="btn btn-secondary mb-3" onclick="window.history.back();">Back</button>
+    <button class="btn btn-warning mb-3" id="ChnageSataus">mark as done</button>
     <hr>
     <div class="row text-center">
 
@@ -146,10 +161,28 @@ if(!isset($_SESSION['admin_Id'])) {
         .catch(error => console.error('Error:', error));
     }
 
-
-
-});
-
+    document.getElementById('ChnageSataus').addEventListener('click', function() {
+        if (confirm('Are you sure you want to mark this as done?')) {
+            fetch('getInstructordetails.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'action=changeStatus',
+            })
+            .then(response => response.json())
+            .then(data => {
+            if (data.success) {
+                alert('Status changed successfully');
+            } else {
+                alert('Failed to change status');
+            }
+            })
+            .catch(error => console.error('Error:', error));
+        }else{
+            alert('Status not changed');
+        }
+    })
 </script>
 </body>
 </html>

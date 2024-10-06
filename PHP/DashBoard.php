@@ -13,6 +13,7 @@ $Year_revenue = 0;
 $revenue = 0;
 
 $pendign_user = 0;
+$pendign_instructor= 0;
 
 if(isset($_SESSION['admin_Id'])) {
   unset($_SESSION['Password']);
@@ -79,6 +80,16 @@ if ($result_instructor->num_rows > 0) {
 } else {
   $totalInstructor = "N/A";
 }
+$sql_pending_instructor = "SELECT COUNT(*) AS total_users_pending FROM instrutor WHERE Chnage_status = 1";  // Replace your_table_name with the actual table name
+$result_pending_instructor = $conn->query($sql_pending_instructor);
+
+if ($result_pending_instructor->num_rows > 0) {
+    $row = $result_pending_instructor->fetch_assoc();
+  $pendign_instructor = $row['total_users_pending'];
+} else {
+  $pendign_instructor = "N/A";
+}
+
 
 $sql_pending_user = "SELECT COUNT(*) AS total_users_pending FROM users WHERE membership_status = 0 AND payment_slip != 'null'";  // Replace your_table_name with the actual table name
 $result_pending_user = $conn->query($sql_pending_user);
@@ -472,7 +483,7 @@ if(isset($_POST['logout'])) {
       <li><a href="Passwordchek.php">Verifications Membership <span style="color:red; font-size:20px; font-weight:bold"> &nbsp<?php echo $pendign_user ?></span></a></li>
       <li><a href="membershipMangemnt.php">Membership Manage</a></li>
       <li><a href="onlineClzMange.php">Online Class Manage</a></li>
-      <li><a href="insructorShowMange.php">Instruct Display Manage</a></li>
+      <li><a href="insructorShowMange.php">Instruct Display Manage<span style="color:red; font-size:20px; font-weight:bold"> &nbsp<?php echo $pendign_instructor ?></span></a></li>
       <li><a href="#">Report Generator</a></li>
       <li><input id="Logout-btn" class="Logout-button" type="button" value="Log out"></li>
 
