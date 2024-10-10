@@ -104,7 +104,17 @@ $pdf->Ln(10);
         generate_charts($data_for_charts);  // Function to generate chart
         $pdf->Image('chart.png', 10, $pdf->GetY(), 190); // Add chart image to PDF
     }
-    
+    $report_file_name = "report_" . time() . ".pdf";
+    $pdf->Output('F', 'reports/' . $report_file_name);  // Save the PDF file to the reports folder
+
+// Optionally, store the filename in the session or database for retrieval later
+   $_SESSION['last_generated_report'] = $report_file_name;
+
+   $report_name = $report_file_name;
+   $query = "INSERT INTO generated_reports (report_name) VALUES ('$report_name')";
+   mysqli_query($conn, $query);
+
+
     // Output the PDF
     $pdf->Output();
 
@@ -233,16 +243,67 @@ function generate_charts($data) {
       </div>
     </div>
 
-    <!-- Generated Report Section -->
-    <div class="card mt-4">
-      <div class="card-body">
-        <h5 class="card-title">Generated Report</h5>
-        <div id="reportContent">
-          <!-- Report content will appear here after generation -->
-          <p>No report generated yet.</p>
-        </div>
-      </div>
-    </div>
+  <!-- Generated Report Section -->
+<div class="card mt-4">
+  <div class="card-body">
+    <h5 class="card-title">Generated Reports</h5>
+    <?php 
+    // Fetch all generated reports from the database
+    $query = "SELECT report_name, generated_at FROM generated_reports ORDER BY generated_at DESC";
+    $result = mysqli_query($conn, $query);
+
+    if ($result && mysqli_num_rows($result) > 0) { 
+    ?>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Report Name</th>
+              <th scope="col">Generated At</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+          <?php 
+          $index = 1;
+          while ($row = mysqli_fetch_assoc($result)) {
+              $report_name = $row['report_name'];
+              $generated_at = date("d/m/Y H:i", strtotime($row['generated_at']));
+          ?>
+            <tr>
+              <th scope="row"><?= $index++ ?></th>
+              <td><?= $report_name ?></td>
+              <td><?= $generated_at ?></td>
+              <td>
+                <!-- View Button -->
+                <a href="reports/<?= $report_name ?>" class="btn btn-primary btn-sm" target="_blank">View</a>
+                <!-- Download Button -->
+                <a href="reports/<?= $report_name ?>" download class="btn btn-secondary btn-sm">Download</a>
+                <!-- Delete Button -->
+                <form action="delete_report.php" method="POST" style="display:inline-block;">
+                  <input type="hidden" name="report_name" value="<?= $report_name ?>">
+                  <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this report?');">Delete</button>
+                </form>
+              </td>
+            </tr>
+          <?php 
+          } 
+          ?>
+          </tbody>
+        </table>
+    <?php 
+    } else { 
+    ?>
+        <p>No reports generated yet.</p>
+    <?php 
+    } 
+    ?>
+  </div>
+</div>
+
+
+
+
   </div>
 
   <!-- Bootstrap JS (optional) -->
