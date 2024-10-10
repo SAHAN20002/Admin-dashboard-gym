@@ -1,8 +1,25 @@
 <?php
+require('fpdf.php');
+// class PDF extends FPDF {
+//   // Footer method to add footer details
+//   function Footer() {
+//       // Set position at 15 mm from bottom
+//       $this->SetY(-15);
+      
+//       // Set font for footer
+//       $this->SetFont('Arial', 'c', 8);
+      
+//       // Add gym details in the footer
+//       $this->Cell(0, 10, 'Fitness Zone Gym | Address: 123 Gym Street, City, Country | Phone: +123 456 7890 | Email: info@fitnesszone.com', 0, 0, 'C');
+//   }
+// }
+
+date_default_timezone_set('Asia/Colombo'); // Set your timezone here, e.g., 'America/New_York'
 
 include 'phpcon.php';
-require('fpdf.php');
+
 session_start();
+$current_time = date("Y-m-d H:i:s");
 if(!isset($_SESSION['admin_Id'])) {
    header('Location: index.php');
 }
@@ -27,9 +44,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $pdf = new FPDF();
     $pdf->AddPage();
     $pdf->SetFont('Arial', 'B', 12);
+    // Include company letterhead (make sure to provide the correct path to the image)
+$pdf->Image('C:\wamp64\www\sahan\admin-main\IMG\logo.png', 10, 6, 30);  // Adjust the path and dimensions
+
+// Move to the right to align the header properly
+$pdf->Cell(80);
+
+// Add current date and time
+
+$pdf->Cell(0, 10, "Generated on: " . $current_time , 0, 1, 'R');  // Align to right
+$pdf->Ln(20);
+
+// Add search time period (adjust $search_start and $search_end with your dynamic values)
+$search_start = "2024-10-01";  // Example start date
+$search_end = "2024-10-10";    // Example end date
+$pdf->Cell(0, 10, "Search Period: " . $search_start . " to " . $search_end, 0, 1, 'L');
+$pdf->Ln(10);
+
     
     // Add header
-    $pdf->Cell(0, 10, "Membership Report", 0, 1, 'C');
+    $pdf->Cell(0, 10, "Full Revenue Report", 0, 1, 'C');
     $pdf->Ln();
     
     // Add column headers
@@ -38,8 +72,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $pdf->Cell(40, 10, 'User Name', 1);
     $pdf->Cell(60, 10, 'Email', 1);
     $pdf->Cell(20, 10, 'Gender', 1);
-    $pdf->Cell(30, 10, 'Membership ID', 1);
-    $pdf->Cell(30, 10, 'Cost', 1);
+    $pdf->Cell(35, 10, 'Membership Plan', 1);
+    $pdf->Cell(25, 10, 'Cost', 1);
+   
     $pdf->Ln();
 
     // Store data for charts
@@ -53,8 +88,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $pdf->Cell(40, 10, $row['user_name'], 1);
             $pdf->Cell(60, 10, $row['email'], 1);
             $pdf->Cell(20, 10, $row['gender'], 1);
-            $pdf->Cell(30, 10, $row['membership_id'], 1);
-            $pdf->Cell(30, 10, $row['cost'], 1);
+            $pdf->Cell(35, 10, $row['membership_id'], 1);
+            $pdf->Cell(25, 10, $row['cost'], 1);
             $pdf->Ln();
 
             // Collect data for chart
@@ -69,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         generate_charts($data_for_charts);  // Function to generate chart
         $pdf->Image('chart.png', 10, $pdf->GetY(), 190); // Add chart image to PDF
     }
-
+    
     // Output the PDF
     $pdf->Output();
 
