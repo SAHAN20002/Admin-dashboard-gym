@@ -1,0 +1,100 @@
+/* General Styles */
+body {
+    background-image: url('IMG/bg.jpg');
+    background-repeat: no-repeat;
+    background-position: center;
+    
+    font-family: 'Arial', sans-serif;
+}
+
+h1 {
+  color: #ffff00;
+  font-weight: bold;
+}
+
+.card {
+  box-shadow: 0 4px 8px #3a3a00;
+}
+.card-body{
+    background-color: #ddd600d8;
+    border: #ffff00;
+    
+}
+
+.card-title {
+  font-weight: bold;
+}
+
+
+label {
+  font-weight: 500;
+  color: #000000;
+}
+
+.form-control, .form-select {
+  border: 1px solid #373b03;
+  border-radius: 4px;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 8px #000000;
+}
+
+.form-check-label {
+  font-size: 16px;
+  color: #555;
+}
+
+button {
+  width: 200px;
+  padding: 10px;
+  font-size: 18px;
+}
+
+/* Generated Report Section */
+#reportContent {
+  background-color: #000000;
+  padding: 20px;
+  border-radius: 4px;
+}
+
+.text-center{
+    background-image:url('IMG/btn.jpg');
+    border: #ffff00;
+}
+.button {
+    background-color: #000000;
+    border: 3px solid #ffff00;
+    color: #ffff00;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #ffff00;
+    border: 3px solid #ff0000;
+    color: #000000;
+    font-size: 18px;
+}
+
+
+#reportContent p {
+  color: #888;
+  font-style: italic;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .card {
+    margin: 0 20px;
+  }
+
+  button {
+    width: 100%;
+  }
+}
