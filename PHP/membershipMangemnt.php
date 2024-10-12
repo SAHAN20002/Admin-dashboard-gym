@@ -5,6 +5,26 @@ if(!isset($_SESSION['admin_Id'])) {
    header('Location: index.php');
 }
 
+
+if($_SERVER["REQUEST_METHOD"] == "POST") {
+    $P_I = $_POST['P_I'];
+    $P_D = $_POST['P_D'];
+    $P_P = $_POST['P_P'];
+    $B_01 = $_POST['B_01'];
+    $B_02 = $_POST['B_02'];
+    $B_03 = $_POST['B_03'];
+    $B_04 = $_POST['B_04'];
+    $B_05 = $_POST['B_05'];
+
+    $sql = "UPDATE membership SET name='$P_D', price='$P_P', benefits_1='$B_01', benefits_2='$B_02', benefits_3='$B_03', benefits_4='$B_04', benefits_5='$B_05' WHERE p_id='$P_I'";
+
+    if ($conn->query($sql) === TRUE) {
+        echo '<script>alert("record updated successfully")</script>';
+        echo '<script>window.history.replaceState({}, document.title, "membershipMangemnt.php");</script>';
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
 ?>
 
 
@@ -95,34 +115,38 @@ if(!isset($_SESSION['admin_Id'])) {
 <div class="container mt-5">
    
         <button class="btn btn-secondary mb-3" onclick="window.history.back();">Back</button>
-        <form method="POST" action="addInstructor2.php">
+        <form method="POST" action="membershipMangemnt.php">
+            <div class="mb-3" style="display:none;">
+                <label for="P_I" class="form-label">Plan ID </label>
+                <input type="text" class="form-control" id="P_I" name="P_I" required>
+            </div>
             <div class="mb-3">
                 <label for="P_D" class="form-label">Plan Duration </label>
-                <input type="text" class="form-control " id="P_D" name="P_D" value="" required>
+                <input type="text" class="form-control " id="P_D" name="P_D"  required>
             </div>
             <div class="mb-3">
                 <label for="P_P" class="form-label">Plan Price</label>
-                <input type="text" class="form-control" id="P_P" name="P_P" value="" required>
+                <input type="text" class="form-control" id="P_P" name="P_P"  required>
             </div>
             <div class="mb-3">
                 <label for="B_01" class="form-label">Benefit 01 </label>
-                <input type="text" class="form-control" id="B_01" name="B_01" value="" required>
+                <input type="text" class="form-control" id="B_01" name="B_01"  required>
             </div>
             <div class="mb-3">
                 <label for="B_02" class="form-label">Benefit 02</label>
-                <input type="text" class="form-control" id="B_02" name="B_02" value="" required>
+                <input type="text" class="form-control" id="B_02" name="B_02"  required>
             </div>
             <div class="mb-3">
                 <label for="B_03" class="form-label">Benefit 03</label>
-                <input type="text" class="form-control" id="B_03" name="B_03" value="" required>
+                <input type="text" class="form-control" id="B_03" name="B_03"  required>
             </div>
             <div class="mb-3">
                 <label for="B_04" class="form-label">Benefit 04</label>
-                <input type="text" class="form-control" id="B_04" name="B_04" value="" required>
+                <input type="text" class="form-control" id="B_04" name="B_04"  required>
             </div>
             <div class="mb-3">
                 <label for="B_05" class="form-label">Benefit 05</label>
-                <input type="text" class="form-control" id="B_05" name="B_05" value="" required>
+                <input type="text" class="form-control" id="B_05" name="B_05"  required>
             </div>
             
             <div class="text-center">
@@ -152,6 +176,7 @@ if(!isset($_SESSION['admin_Id'])) {
         .then(data => {
             // Populate form fields with the fetched data
             console.log(data);
+            document.getElementById('P_I').value = data.planId;
             document.getElementById('P_D').value = data.planDuration;
             document.getElementById('P_P').value = data.planPrice;
             document.getElementById('B_01').value = data.benefit1;

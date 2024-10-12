@@ -88,13 +88,3 @@ button {
   font-style: italic;
 }
 
-/* Media Queries */
-@media (max-width: 768px) {
-  .card {
-    margin: 0 20px;
-  }
-
-  button {
-    width: 100%;
-  }
-}

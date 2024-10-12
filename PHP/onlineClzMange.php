@@ -1,9 +1,31 @@
 <?php
 include 'phpcon.php';
-session_start();
-if(!isset($_SESSION['admin_Id'])) {
-   header('Location: index.php');
-}
+
+
+// if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['text'] == 'search') {
+//     $search = $_POST['search'];
+
+//     $sqlSearch = "SELECT * FROM zoom_clz WHERE Id LIKE '%$search%' ";
+//     $result = $conn->query($sqlSearch);
+    
+//     if ($result->num_rows > 0) {
+//         // Fetch data as an associative array
+//         $row = $result->fetch_assoc();
+//         echo json_encode([
+//             'Clz_Id' => $row['Id'],
+//             'Topic' => $row['Topic'],
+//             'Instructor_name' => $row['Instructor_name'],
+//             'time' => $row['Time'],
+//             'date' => $row['date'],
+//             'link' => $row['Link']
+//         ]);
+//     } else {
+//         echo json_encode(['error' => 'No data found']);
+//     }
+// }
+    
+   
+
 ?>
 
 
@@ -81,8 +103,8 @@ if(!isset($_SESSION['admin_Id'])) {
 <div class="row mb-4 justify-content-center mt-4">
     <div class="col-md-6">
         <form class="d-flex">
-            <input class="form-control me-2" type="search" placeholder="Search Memberships" aria-label="Search">
-            <button class="btn btn-outline-success" type="submit">Search</button>
+            <input class="form-control me-2" type="search"id="search_text" placeholder="Search Memberships" aria-label="Search">
+            <button class="btn btn-outline-success"id="search" type="submit">Search</button>
         </form>
     </div>
 </div>
@@ -93,41 +115,85 @@ if(!isset($_SESSION['admin_Id'])) {
    
         <button class="btn btn-secondary mb-3" onclick="window.history.back();">Back</button>
         <form method="POST" action="addInstructor2.php">
-            <div class="mb-3">
-                <label for="P_D" class="form-label">Plan ID </label>
-                <input type="text" class="form-control" id="P_D" name="P_D" value="" required>
+            <div class="mb-3" style="display:none">
+                <label for="C_I" class="form-label">Class ID </label>
+                <input type="text" class="form-control" id="C_I" name="C_I" value="" required>
             </div>
             <div class="mb-3">
-                <label for="P_P" class="form-label">Topic</label>
-                <input type="text" class="form-control" id="P_P" name="P_P" value="" required>
+                <label for="T_P" class="form-label">Topic</label>
+                <input type="text" class="form-control" id="T_P" name="T_P" value="" required>
             </div>
             <div class="mb-3">
-                <label for="B_01" class="form-label"> Start Time </label>
-                <input type="time" class="form-control" id="B_01" name="B_01" value="" required>
+                <label for="I_N" class="form-label">Instructor Name</label>
+                <input type="text" class="form-control" id="I_N" name="I_N" value="" required>
             </div>
             <div class="mb-3">
-                <label for="B_01" class="form-label"> End Time </label>
-                <input type="time" class="form-control" id="B_01" name="B_01" value="" required>
+                <label for="S_T" class="form-label"> Start Time </label>
+                <input type="text" class="form-control" id="S_T" name="S_T" value="" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="D_A" class="form-label">Date</label>
+                <input type="date" class="form-control" id="D_A" name="D_A" value="" required>
             </div>
             <div class="mb-3">
-                <label for="B_02" class="form-label">Date</label>
-                <input type="date" class="form-control" id="B_02" name="B_02" value="" required>
-            </div>
-            <div class="mb-3">
-                <label for="B_03" class="form-label">Link</label>
-                <input type="text" class="form-control" id="B_03" name="B_03" value="" required>
+                <label for="L_K" class="form-label">Link</label>
+                <input type="text" class="form-control" id="L_K" name="L_K" value="" required>
             </div>
            
             
             <div class="text-center">
-                <button type="submit" class="btn btn-primary  mb-3">Submit</button>
+                <button type="submit"  id="sumbit" class="btn btn-primary  mb-3" style="display:show">Submit</button>
                 <button type="reset" class="btn btn-secondary  mb-3">Reset</button>
-                <button type="button" class="btn btn-danger mb-3">Delete</button>
+                <button type="delete" class="btn btn-danger mb-3">Delete</button>
+                <button type="delete" id="updated" class="btn btn-warning mb-3" style="display:none">Update</button>
             </div>
         </form>
       </div>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('search').addEventListener('click', function(e) {
+        e.preventDefault();
+        let searchText = document.getElementById('search_text').value;
+        if (searchText.trim() === '') {
+            alert('Please enter a search keyword');
+            return;
+        }
+        
+        fetch('getclzdetail.php', {
+            method: 'POST',
+            body: JSON.stringify({ search: searchText, text: 'search' }),
+            headers: {
+            'Content-type': 'application/json; charset=UTF-8'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.error) {
+            alert(data.error);
+            } else {
+
+                document.getElementById('C_I').value = data.Clz_Id;
+                document.getElementById('T_P').value = data.Topic;
+                document.getElementById('I_N').value = data.Instructor_name;
+                document.getElementById('S_T').value = data.time;
+               
+                let formattedDate = data.date.replace(/\//g, '-');
+                document.getElementById('D_A').value = formattedDate;
+
+                document.getElementById('L_K').value = data.link;
+
+                document.getElementById('sumbit').style.display = 'none';
+                document.getElementById('updated').style.display = '';
+
+            }
+        })
+        .catch(error => console.error('Error:', error));
+
+    });
+</script>
 </body>
 </html>
