@@ -57,16 +57,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     } elseif (isset($_POST['updated'])) {
        
-        $sql = "UPDATE classes SET 
-                topic = '$topic', 
-                instructor_name = '$instructorName', 
-                start_time = '$startTime', 
+        $sql = "UPDATE zoom_clz SET 
+                Topic = '$topic', 
+                Instructor_name = '$instructorName', 
+                Time = '$startTime', 
                 date = '$date', 
-                link = '$link' 
-                WHERE class_id = '$classId'";
+                Link = '$link' 
+                WHERE Id = '$classId'";
 
         if ($conn->query($sql) === TRUE) {
-            echo "Class successfully updated";
+            echo "<script>alert('Class successfully updated');</script>";
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;
         }
@@ -139,6 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                               <li>'.$row["date"].'</li>
                               <li>'.$row["Link"].'</li>
                             </ul>
+                              <button type="delete" class="btn btn-danger mb-3">Delete</button>
                           </div>
                        </div>
                     </div>
@@ -200,8 +201,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="text-center">
                 <button type="submit" name="sumbit" id="sumbit" class="btn btn-primary  mb-3" style="display:show">Submit</button>
                 <button type="reset" class="btn btn-secondary  mb-3">Reset</button>
-                <button type="delete" class="btn btn-danger mb-3">Delete</button>
-                <button type="delete" id="updated" class="btn btn-warning mb-3" style="display:none">Update</button>
+              
+                <button type="delete" name="updated" id="updated" class="btn btn-warning mb-3" style="display:none">Update</button>
             </div>
         </form>
       </div>
