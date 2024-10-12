@@ -1,28 +1,83 @@
 <?php
 include 'phpcon.php';
 
+$sqlLastId = "SELECT MAX(Id) as last_id FROM zoom_clz";
+$resultLastId = $conn->query($sqlLastId);
 
-// if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['text'] == 'search') {
-//     $search = $_POST['search'];
+if ($resultLastId->num_rows > 0) {
+    $row = $resultLastId->fetch_assoc();
+    $newId = $row['last_id'] + 1;
+} else {
+    $newId = 1; // Default to 1 if no records found
+}
+?>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('C_I').value = <?php echo $newId; ?>;
+    });
+</script>
+<?php
 
-//     $sqlSearch = "SELECT * FROM zoom_clz WHERE Id LIKE '%$search%' ";
-//     $result = $conn->query($sqlSearch);
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
-//     if ($result->num_rows > 0) {
-//         // Fetch data as an associative array
-//         $row = $result->fetch_assoc();
-//         echo json_encode([
-//             'Clz_Id' => $row['Id'],
-//             'Topic' => $row['Topic'],
-//             'Instructor_name' => $row['Instructor_name'],
-//             'time' => $row['Time'],
-//             'date' => $row['date'],
-//             'link' => $row['Link']
-//         ]);
-//     } else {
-//         echo json_encode(['error' => 'No data found']);
-//     }
-// }
+   
+    $classId = isset($_POST['C_I']) ? $_POST['C_I'] : '';
+    $topic = isset($_POST['T_P']) ? $_POST['T_P'] : '';
+    $instructorName = isset($_POST['I_N']) ? $_POST['I_N'] : '';
+    $startTime = isset($_POST['S_T']) ? $_POST['S_T'] : '';
+    $date = isset($_POST['D_A']) ? $_POST['D_A'] : '';
+    $link = isset($_POST['L_K']) ? $_POST['L_K'] : '';
+    
+
+   
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    
+    if (isset($_POST['sumbit'])) {
+       
+        $sql = "INSERT INTO zoom_clz (Id, Topic, Instructor_name, Time, date, Link) 
+                VALUES ('$classId','$topic', '$instructorName', '$startTime', '$date', '$link')";
+
+        if ($conn->query($sql) === TRUE) {
+            echo "<script>alert('New class successfully created');</script>";
+           
+        } else {
+            echo "Error: " . $sql . "<br>" . $conn->error;
+        }
+    } elseif (isset($_POST['delete'])) {
+       
+        $sql = "DELETE FROM classes WHERE class_id = '$classId'";
+
+        if ($conn->query($sql) === TRUE) {
+            echo "Class successfully deleted";
+        } else {
+            echo "Error: " . $sql . "<br>" . $conn->error;
+        }
+    } elseif (isset($_POST['updated'])) {
+       
+        $sql = "UPDATE classes SET 
+                topic = '$topic', 
+                instructor_name = '$instructorName', 
+                start_time = '$startTime', 
+                date = '$date', 
+                link = '$link' 
+                WHERE class_id = '$classId'";
+
+        if ($conn->query($sql) === TRUE) {
+            echo "Class successfully updated";
+        } else {
+            echo "Error: " . $sql . "<br>" . $conn->error;
+        }
+    }
+
+    
+    
+}
+
+
+
     
    
 
@@ -114,10 +169,10 @@ include 'phpcon.php';
 <div class="container mt-5">
    
         <button class="btn btn-secondary mb-3" onclick="window.history.back();">Back</button>
-        <form method="POST" action="addInstructor2.php">
-            <div class="mb-3" style="display:none">
+        <form method="POST" action="onlineClzMange.php">
+            <div class="mb-3" >
                 <label for="C_I" class="form-label">Class ID </label>
-                <input type="text" class="form-control" id="C_I" name="C_I" value="" required>
+                <input type="text" class="form-control" id="C_I" name="C_I" value="" required readonly>
             </div>
             <div class="mb-3">
                 <label for="T_P" class="form-label">Topic</label>
@@ -143,7 +198,7 @@ include 'phpcon.php';
            
             
             <div class="text-center">
-                <button type="submit"  id="sumbit" class="btn btn-primary  mb-3" style="display:show">Submit</button>
+                <button type="submit" name="sumbit" id="sumbit" class="btn btn-primary  mb-3" style="display:show">Submit</button>
                 <button type="reset" class="btn btn-secondary  mb-3">Reset</button>
                 <button type="delete" class="btn btn-danger mb-3">Delete</button>
                 <button type="delete" id="updated" class="btn btn-warning mb-3" style="display:none">Update</button>
