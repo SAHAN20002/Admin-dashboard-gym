@@ -1,18 +1,5 @@
 <?php
 require('fpdf.php');
-// class PDF extends FPDF {
-//   // Footer method to add footer details
-//   function Footer() {
-//       // Set position at 15 mm from bottom
-//       $this->SetY(-15);
-      
-//       // Set font for footer
-//       $this->SetFont('Arial', 'c', 8);
-      
-//       // Add gym details in the footer
-//       $this->Cell(0, 10, 'Fitness Zone Gym | Address: 123 Gym Street, City, Country | Phone: +123 456 7890 | Email: info@fitnesszone.com', 0, 0, 'C');
-//   }
-// }
 
 date_default_timezone_set('Asia/Colombo'); // Set your timezone here, e.g., 'America/New_York'
 
@@ -29,6 +16,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $end_date = $_POST['end_date'];
     $report_type = $_POST['report_type'];
     $include_charts = isset($_POST['include_charts']) ? true : false;
+    $report_type = $_POST['report_type'];
+
+    switch($report_type){
+        case 'full_revenue':
+            generate_full_revenue_report($start_date, $end_date, $include_charts);
+            break;
+        case 'week_revenue':
+            generate_week_revenue_report($start_date, $end_date, $include_charts);
+            break;
+        case 'month_revenue':
+            generate_month_revenue_report($start_date, $end_date, $include_charts);
+            break;
+        case 'year_revenue':
+            generate_year_revenue_report($start_date, $end_date, $include_charts);
+            break;
+        case 'instructor':
+            generate_instructor_report($start_date, $end_date, $include_charts);
+            break;
+        case 'user_Repoart':
+            generate_user_report($start_date, $end_date, $include_charts);
+            break;
+        case 'Online_Clz':
+            generate_online_clz_report($start_date, $end_date, $include_charts);
+            break;
+        default:
+            echo "Invalid report type!";
+            break;
+    }
 
 
     $stmt = $conn->prepare("SELECT u.user_id, u.user_name, u.email, u.gender, 
