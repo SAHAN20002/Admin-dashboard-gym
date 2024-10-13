@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $date = isset($_POST['D_A']) ? $_POST['D_A'] : '';
     $link = isset($_POST['L_K']) ? $_POST['L_K'] : '';
     
-
+    $data = json_decode(file_get_contents('php://input'), true);
    
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
@@ -46,15 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;
         }
-    } elseif (isset($_POST['delete'])) {
-       
-        $sql = "DELETE FROM classes WHERE class_id = '$classId'";
-
-        if ($conn->query($sql) === TRUE) {
-            echo "Class successfully deleted";
-        } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
-        }
+    
     } elseif (isset($_POST['updated'])) {
        
         $sql = "UPDATE zoom_clz SET 
@@ -66,6 +58,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 WHERE Id = '$classId'";
 
         if ($conn->query($sql) === TRUE) {
+           
+            echo '<script>
+                  window.history.replaceState({}, document.title, "onlineClzMange.php");
+                  window.onpopstate = function() {
+                  window.history.go(1); // Prevent going back
+                 };
+                 </script>';
             echo "<script>alert('Class successfully updated');</script>";
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;
@@ -139,11 +138,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                               <li>'.$row["date"].'</li>
                               <li>'.$row["Link"].'</li>
                             </ul>
-                              <button type="delete" class="btn btn-danger mb-3">Delete</button>
+                             <button type="button" class="btn btn-danger mb-3" onclick="deleteClass(' . $row['Id'] . ')">Delete</button>
                           </div>
+                          
                        </div>
+                       
                     </div>
-        ';
+               ';
+               
     }
 } else {
     echo "0 results";
@@ -250,6 +252,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .catch(error => console.error('Error:', error));
 
     });
+
+
+    function deleteClass(id) {
+        
+        if (confirm('Are you sure you want to delete this class?')) {
+            fetch('deleteonlineclz.php', {
+                method: 'POST',
+                body: JSON.stringify({ id: id, text: 'delete' }),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert('Class successfully deleted');
+                    window.location.reload();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
 </script>
 </body>
 </html>
