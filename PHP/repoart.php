@@ -137,7 +137,7 @@ function generate_charts($data) {
     }
 
     // Save chart image as PNG
-    imagepng($image, "chart.png");
+    imagepng($image, "reports/chart.png");
     imagedestroy($image);  // Free memory
 }
 
@@ -221,6 +221,8 @@ function generate_charts($data) {
         <option value="month_revenue">Month Revenue Report</option>
         <option value="year_revenue">Year Revenue Report</option>
         <option value="instructor">Instructor Report</option>
+        <option value="user_Repoart">User Report</option>
+        <option value="Online_Clz">Online clz Report</option>
       </select>
     </div>
 

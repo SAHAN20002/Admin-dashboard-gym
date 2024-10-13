@@ -1,6 +1,4 @@
-setTimeout(function(){
-    window.location.href = "instructorPaswordChk.php"; 
-  }, 18000000);
+
 
 window.history.pushState(null, null, window.location.href);
 window.onpopstate = function () {

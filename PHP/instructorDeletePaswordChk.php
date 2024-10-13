@@ -5,24 +5,24 @@ header("Pragma: no-cache");
 include 'phpcon.php';
 session_start();
 
-if (!isset($_SESSION['NIC'])) {
+if (!isset($_SESSION['admin_Id'])) {
     header('location:index.php');
     exit();
   }else{
     
    
-    $NIC = $_SESSION['NIC'] ;
+    $ID = $_SESSION['admin_Id'] ;
    
     if(isset($_POST['password'])){
         $password = $_POST['password'];
-        $sql = "SELECT * FROM instrutor WHERE NIC = '$NIC'";
+        $sql = "SELECT * FROM admin WHERE admin_Id  = '$ID'";
         $result = $conn->query($sql);
         if($result->num_rows > 0){
             $row = $result->fetch_assoc();
             if ($password === $row['Password']) {
                 echo "<script>alert('Password is correct');</script>";
-                $_SESSION['Password'] = $row['Password'];
-                header('location:instructor_userChek.php');
+                
+                header('location:deleteinstructor.php');
             }else{
                 echo "<script>alert('Password is incorrect');</script>";
                 
@@ -88,7 +88,7 @@ if (!isset($_SESSION['NIC'])) {
 <body>
     <div class="container">
         <h2>Password Check</h2>
-        <form action="instructorPaswordChk.php" method="post">
+        <form action="instructorDeletePaswordChk.php" method="post">
             <input type="password" name="password" placeholder="Enter your password" required>
             <input type="submit" value="Check Password">
         </form>

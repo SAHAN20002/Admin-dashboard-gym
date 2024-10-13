@@ -197,26 +197,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         </form>
       </div>
       <?php else: ?>
-        <div class="card-container">
-            <h2 class="text-center">Instructor List (Max 3 Members)</h2>
-            <button class="btn btn-secondary mb-3" onclick="window.history.back();">Back</button>
-            <div class="row">
-                <?php foreach ($members as $member): ?>
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title"><?=$member['name'] ?></h5>
-                            <p class="card-text"><?=$member['email'] ?></p>
-                            <form method="POST" action="delete_member.php">
-                                <input type="hidden" name="member_id" value="<?= $member['id'] ?>">
-                                <button type="submit" class="btn btn-danger w-100">Delete</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
+        <h2 class="text-center">Maximum Instructors Reached</h2>
+        <p class="text-center">You have reached the maximum number of instructors allowed.</p>
+        <button class="btn btn-primary mb-3" onclick="window.location.href='instructorDeletePaswordChk.php';">Delete Insructor</button>
         <?php endif; ?>   
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
