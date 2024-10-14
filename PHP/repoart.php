@@ -24,33 +24,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                               m.membership_id, m.start_date, m.end_date, m.cost, m.membership_type
                               FROM users u
                               JOIN membership_user m ON u.user_id = m.user_id
-                              WHERE m.start_date >= ? AND m.end_date <= ?");
-      $stmt->bind_param("ss", $start_date, $end_date);  // Bind the start and end dates
+                              WHERE m.start_date >= ? AND m.start_date <= ?");
+      $stmt->bind_param("ss", $start_date, $end_date);  
       $stmt->execute();
       $result = $stmt->get_result();
 
-      // PDF Generation
+      
       $pdf = new FPDF();
       $pdf->AddPage();
       $pdf->SetFont('Arial', 'B', 12);
 
-      // Company letterhead
+      
       $pdf->Image('C:\wamp64\www\sahan\admin-main\IMG\logo.png', 10, 6, 30);
 
-      // Aligning header and adding date/time
+      
       $pdf->Cell(80);
       $pdf->Cell(0, 10, "Generated on: " . date("Y-m-d H:i:s"), 0, 1, 'R');
       $pdf->Ln(20);
 
-      // Dynamic search period
+      
       $pdf->Cell(0, 10, "Search Period: " . $start_date . " to " . $end_date, 0, 1, 'L');
       $pdf->Ln(10);
 
-      // Header
+      
       $pdf->Cell(0, 10, "Full Revenue Report", 0, 1, 'C');
       $pdf->Ln();
 
-      // Column Headers
+      
       $pdf->SetFont('Arial', 'B', 10);
       $pdf->Cell(30, 10, 'User ID', 1);
       $pdf->Cell(40, 10, 'User Name', 1);
@@ -75,66 +75,545 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               $pdf->Cell(25, 10, $row['cost'], 1);
               $pdf->Ln();
 
-              // Collect data for charts
+              
               $data_for_charts[] = $row;
           }
       } else {
           $pdf->Cell(0, 10, "No records found for the given date range.", 0, 1);
       }
 
-      // Include charts if requested
+      
       if ($include_charts) {
-          generate_charts($data_for_charts);  // Ensure you have a chart generation function
+          generate_charts($data_for_charts);  
           $pdf->Image('chart.png', 10, $pdf->GetY(), 190);
       }
-      // Move the cursor to the bottom for additional text
-    $pdf->Ln(20);  // Add space after charts or table
+      
+    $pdf->Ln(20);  
 
-    // Add text at the bottom of the PDF
+    
     $pdf->SetFont('Arial', 'I', 10);
     $pdf->Cell(0, 10, "Note: This is an auto-generated report. For any inquiries, please contact our support team.", 0, 1, 'C');
     $pdf->Ln(5);
     $pdf->Cell(0, 10, "Email: support@example.com | Phone: +1-800-555-1234", 0, 1, 'C');
-      // Save the PDF
-      $report_file_name = "report_" . time() . ".pdf";
+      
+      $report_file_name = "Full_Revenue_Report_" . time() . ".pdf";
       $pdf->Output('F', 'reports/' . $report_file_name);
 
-      // Save report name to the database using prepared statements
+      
       $stmt = $conn->prepare("INSERT INTO generated_reports (report_name) VALUES (?)");
       $stmt->bind_param("s", $report_file_name);
       $stmt->execute();
 
-      // Optionally, store the filename in the session
+      
       $_SESSION['last_generated_report'] = $report_file_name;
 
-      // Close connection
+      
       $conn->close();
 
-      // Output the PDF
+      
       $pdf->Output();
   }
 
+  function generate_week_revenue_report($start_date, $end_date, $include_charts, $conn) {
+    // SQL query
+    $stmt = $conn->prepare("SELECT u.user_id, u.user_name, u.email, u.gender, 
+                            m.membership_id, m.start_date, m.end_date, m.cost, m.membership_type
+                            FROM users u
+                            JOIN membership_user m ON u.user_id = m.user_id
+                            WHERE m.start_date >= ? AND m.start_date <= ? AND m.membership_type = 'Week'");
+    $stmt->bind_param("ss", $start_date, $end_date);  // Bind the start and end dates
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // PDF Generation
+    $pdf = new FPDF();
+    $pdf->AddPage();
+    $pdf->SetFont('Arial', 'B', 12);
+
+    // Company letterhead
+    $pdf->Image('C:\wamp64\www\sahan\admin-main\IMG\logo.png', 10, 6, 30);
+
+    // Aligning header and adding date/time
+    $pdf->Cell(80);
+    $pdf->Cell(0, 10, "Generated on: " . date("Y-m-d H:i:s"), 0, 1, 'R');
+    $pdf->Ln(20);
+
+    // Dynamic search period
+    $pdf->Cell(0, 10, "Search Period: " . $start_date . " to " . $end_date, 0, 1, 'L');
+    $pdf->Ln(10);
+
+    // Header
+    $pdf->Cell(0, 10, "Week Revenue Report", 0, 1, 'C');
+    $pdf->Ln();
+
+    // Column Headers
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Cell(30, 10, 'User ID', 1);
+    $pdf->Cell(40, 10, 'User Name', 1);
+    $pdf->Cell(60, 10, 'Email', 1);
+    $pdf->Cell(20, 10, 'Gender', 1);
+    $pdf->Cell(35, 10, 'Membership Plan', 1);
+    $pdf->Cell(25, 10, 'Cost', 1);
+    $pdf->Ln();
+
+    // Data for charts
+    $data_for_charts = [];
+
+    // Populate table with data
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $pdf->SetFont('Arial', '', 10);
+            $pdf->Cell(30, 10, $row['user_id'], 1);
+            $pdf->Cell(40, 10, $row['user_name'], 1);
+            $pdf->Cell(60, 10, $row['email'], 1);
+            $pdf->Cell(20, 10, $row['gender'], 1);
+            $pdf->Cell(35, 10, $row['membership_id'], 1);
+            $pdf->Cell(25, 10, $row['cost'], 1);
+            $pdf->Ln();
+
+            // Collect data for charts
+            $data_for_charts[] = $row;
+        }
+    } else {
+        $pdf->Cell(0, 10, "No records found for the given date range.", 0, 1);
+    }
+
+    // Include charts if requested
+    if ($include_charts) {
+        generate_charts($data_for_charts);  // Ensure you have a chart generation function
+        $pdf->Image('chart.png', 10, $pdf->GetY(), 190);
+    }
+    // Move the cursor to the bottom for additional text
+  $pdf->Ln(20);  // Add space after charts or table
+
+  // Add text at the bottom of the PDF
+  $pdf->SetFont('Arial', 'I', 10);
+  $pdf->Cell(0, 10, "Note: This is an auto-generated report. For any inquiries, please contact our support team.", 0, 1, 'C');
+  $pdf->Ln(5);
+  $pdf->Cell(0, 10, "Email: support@example.com | Phone: +1-800-555-1234", 0, 1, 'C');
+    // Save the PDF
+    $report_file_name = "Week_M_Revenue_Report" . time() . ".pdf";
+    $pdf->Output('F', 'reports/' . $report_file_name);
+
+    // Save report name to the database using prepared statements
+    $stmt = $conn->prepare("INSERT INTO generated_reports (report_name) VALUES (?)");
+    $stmt->bind_param("s", $report_file_name);
+    $stmt->execute();
+
+    // Optionally, store the filename in the session
+    $_SESSION['last_generated_report'] = $report_file_name;
+
+    // Close connection
+    $conn->close();
+
+    // Output the PDF
+    $pdf->Output();
+}
+
+function generate_month_revenue_report($start_date, $end_date, $include_charts, $conn) {
+  // SQL query
+  $stmt = $conn->prepare("SELECT u.user_id, u.user_name, u.email, u.gender, 
+                          m.membership_id, m.start_date, m.end_date, m.cost, m.membership_type
+                          FROM users u
+                          JOIN membership_user m ON u.user_id = m.user_id
+                          WHERE m.start_date >= ? AND m.start_date <= ? AND m.membership_type = 'Month'");
+  $stmt->bind_param("ss", $start_date, $end_date);  // Bind the start and end dates
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  // PDF Generation
+  $pdf = new FPDF();
+  $pdf->AddPage();
+  $pdf->SetFont('Arial', 'B', 12);
+
+  // Company letterhead
+  $pdf->Image('C:\wamp64\www\sahan\admin-main\IMG\logo.png', 10, 6, 30);
+
+  // Aligning header and adding date/time
+  $pdf->Cell(80);
+  $pdf->Cell(0, 10, "Generated on: " . date("Y-m-d H:i:s"), 0, 1, 'R');
+  $pdf->Ln(20);
+
+  // Dynamic search period
+  $pdf->Cell(0, 10, "Search Period: " . $start_date . " to " . $end_date, 0, 1, 'L');
+  $pdf->Ln(10);
+
+  // Header
+  $pdf->Cell(0, 10, "Month Mebership Plan Revenue Report", 0, 1, 'C');
+  $pdf->Ln();
+
+  // Column Headers
+  $pdf->SetFont('Arial', 'B', 10);
+  $pdf->Cell(30, 10, 'User ID', 1);
+  $pdf->Cell(40, 10, 'User Name', 1);
+  $pdf->Cell(60, 10, 'Email', 1);
+  $pdf->Cell(20, 10, 'Gender', 1);
+  $pdf->Cell(35, 10, 'Membership Plan', 1);
+  $pdf->Cell(25, 10, 'Cost', 1);
+  $pdf->Ln();
+
+  // Data for charts
+  $data_for_charts = [];
+
+  // Populate table with data
+  if ($result->num_rows > 0) {
+      while ($row = $result->fetch_assoc()) {
+          $pdf->SetFont('Arial', '', 10);
+          $pdf->Cell(30, 10, $row['user_id'], 1);
+          $pdf->Cell(40, 10, $row['user_name'], 1);
+          $pdf->Cell(60, 10, $row['email'], 1);
+          $pdf->Cell(20, 10, $row['gender'], 1);
+          $pdf->Cell(35, 10, $row['membership_id'], 1);
+          $pdf->Cell(25, 10, $row['cost'], 1);
+          $pdf->Ln();
+
+          // Collect data for charts
+          $data_for_charts[] = $row;
+      }
+  } else {
+      $pdf->Cell(0, 10, "No records found for the given date range.", 0, 1);
+  }
+
+  // Include charts if requested
+  if ($include_charts) {
+      generate_charts($data_for_charts);  // Ensure you have a chart generation function
+      $pdf->Image('chart.png', 10, $pdf->GetY(), 190);
+  }
+  // Move the cursor to the bottom for additional text
+$pdf->Ln(20);  // Add space after charts or table
+
+// Add text at the bottom of the PDF
+$pdf->SetFont('Arial', 'I', 10);
+$pdf->Cell(0, 10, "Note: This is an auto-generated report. For any inquiries, please contact our support team.", 0, 1, 'C');
+$pdf->Ln(5);
+$pdf->Cell(0, 10, "Email: support@example.com | Phone: +1-800-555-1234", 0, 1, 'C');
+  // Save the PDF
+  $report_file_name = "Month_M_Revenue_Report" . time() . ".pdf";
+  $pdf->Output('F', 'reports/' . $report_file_name);
+
+  // Save report name to the database using prepared statements
+  $stmt = $conn->prepare("INSERT INTO generated_reports (report_name) VALUES (?)");
+  $stmt->bind_param("s", $report_file_name);
+  $stmt->execute();
+
+  // Optionally, store the filename in the session
+  $_SESSION['last_generated_report'] = $report_file_name;
+
+  // Close connection
+  $conn->close();
+
+  // Output the PDF
+  $pdf->Output();
+}
+
+function generate_year_revenue_report($start_date, $end_date, $include_charts, $conn) {
+  // SQL query
+  $stmt = $conn->prepare("SELECT u.user_id, u.user_name, u.email, u.gender, 
+                          m.membership_id, m.start_date, m.end_date, m.cost, m.membership_type
+                          FROM users u
+                          JOIN membership_user m ON u.user_id = m.user_id
+                          WHERE m.start_date >= ? AND m.start_date <= ? AND m.membership_type = 'Year'");
+  $stmt->bind_param("ss", $start_date, $end_date);  // Bind the start and end dates
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  // PDF Generation
+  $pdf = new FPDF();
+  $pdf->AddPage();
+  $pdf->SetFont('Arial', 'B', 12);
+
+  // Company letterhead
+  $pdf->Image('C:\wamp64\www\sahan\admin-main\IMG\logo.png', 10, 6, 30);
+
+  // Aligning header and adding date/time
+  $pdf->Cell(80);
+  $pdf->Cell(0, 10, "Generated on: " . date("Y-m-d H:i:s"), 0, 1, 'R');
+  $pdf->Ln(20);
+
+  // Dynamic search period
+  $pdf->Cell(0, 10, "Search Period: " . $start_date . " to " . $end_date, 0, 1, 'L');
+  $pdf->Ln(10);
+
+  // Header
+  $pdf->Cell(0, 10, "Year Mebership Plan Revenue Report", 0, 1, 'C');
+  $pdf->Ln();
+
+  // Column Headers
+  $pdf->SetFont('Arial', 'B', 10);
+  $pdf->Cell(30, 10, 'User ID', 1);
+  $pdf->Cell(40, 10, 'User Name', 1);
+  $pdf->Cell(60, 10, 'Email', 1);
+  $pdf->Cell(20, 10, 'Gender', 1);
+  $pdf->Cell(35, 10, 'Membership Plan', 1);
+  $pdf->Cell(25, 10, 'Cost', 1);
+  $pdf->Ln();
+
+  // Data for charts
+  $data_for_charts = [];
+
+  // Populate table with data
+  if ($result->num_rows > 0) {
+      while ($row = $result->fetch_assoc()) {
+          $pdf->SetFont('Arial', '', 10);
+          $pdf->Cell(30, 10, $row['user_id'], 1);
+          $pdf->Cell(40, 10, $row['user_name'], 1);
+          $pdf->Cell(60, 10, $row['email'], 1);
+          $pdf->Cell(20, 10, $row['gender'], 1);
+          $pdf->Cell(35, 10, $row['membership_id'], 1);
+          $pdf->Cell(25, 10, $row['cost'], 1);
+          $pdf->Ln();
+
+          // Collect data for charts
+          $data_for_charts[] = $row;
+      }
+  } else {
+      $pdf->Cell(0, 10, "No records found for the given date range.", 0, 1);
+  }
+
+  // Include charts if requested
+  if ($include_charts) {
+      generate_charts($data_for_charts);  // Ensure you have a chart generation function
+      $pdf->Image('chart.png', 10, $pdf->GetY(), 190);
+  }
+  // Move the cursor to the bottom for additional text
+$pdf->Ln(20);  // Add space after charts or table
+
+// Add text at the bottom of the PDF
+$pdf->SetFont('Arial', 'I', 10);
+$pdf->Cell(0, 10, "Note: This is an auto-generated report. For any inquiries, please contact our support team.", 0, 1, 'C');
+$pdf->Ln(5);
+$pdf->Cell(0, 10, "Email: support@example.com | Phone: +1-800-555-1234", 0, 1, 'C');
+  // Save the PDF
+  $report_file_name = "Year_M_Revenue_Report" . time() . ".pdf";
+  $pdf->Output('F', 'reports/' . $report_file_name);
+
+  // Save report name to the database using prepared statements
+  $stmt = $conn->prepare("INSERT INTO generated_reports (report_name) VALUES (?)");
+  $stmt->bind_param("s", $report_file_name);
+  $stmt->execute();
+
+  // Optionally, store the filename in the session
+  $_SESSION['last_generated_report'] = $report_file_name;
+
+  // Close connection
+  $conn->close();
+
+  // Output the PDF
+  $pdf->Output();
+}
+
+function generate_instructor_report($start_date, $end_date, $include_charts, $conn) {
+  // SQL query
+  $stmt = $conn->prepare("SELECT u.user_id, u.user_name, u.email, u.gender, 
+                          m.Id, m.s_date, m.e_date, m.cost, m.Instructor_Id
+                          FROM users u
+                          JOIN instructor_user m ON u.user_id = m.user_Id 
+                          WHERE m.s_date >= ? AND m.s_date <= ?");
+  $stmt->bind_param("ss", $start_date, $end_date);  // Bind the start and end dates
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  // PDF Generation
+  $pdf = new FPDF();
+  $pdf->AddPage();
+  $pdf->SetFont('Arial', 'B', 12);
+
+  // Company letterhead
+  $pdf->Image('C:\wamp64\www\sahan\admin-main\IMG\logo.png', 10, 6, 30);
+
+  // Aligning header and adding date/time
+  $pdf->Cell(80);
+  $pdf->Cell(0, 10, "Generated on: " . date("Y-m-d H:i:s"), 0, 1, 'R');
+  $pdf->Ln(20);
+
+  // Dynamic search period
+  $pdf->Cell(0, 10, "Search Period: " . $start_date . " to " . $end_date, 0, 1, 'L');
+  $pdf->Ln(10);
+
+  // Header
+  $pdf->Cell(0, 10, "Instructor Plan Revenue Report", 0, 1, 'C');
+  $pdf->Ln();
+
+  // Column Headers
+  $pdf->SetFont('Arial', 'B', 10);
+  $pdf->Cell(30, 10, 'User ID', 1);
+  $pdf->Cell(40, 10, 'User Name', 1);
+  $pdf->Cell(60, 10, 'Email', 1);
+  $pdf->Cell(20, 10, 'Gender', 1);
+  $pdf->Cell(35, 10, 'Instructor', 1);
+  $pdf->Cell(25, 10, 'Cost', 1);
+  $pdf->Ln();
+
+  // Data for charts
+  $data_for_charts = [];
+
+  // Populate table with data
+  if ($result->num_rows > 0) {
+      while ($row = $result->fetch_assoc()) {
+          $pdf->SetFont('Arial', '', 10);
+          $pdf->Cell(30, 10, $row['user_id'], 1);
+          $pdf->Cell(40, 10, $row['user_name'], 1);
+          $pdf->Cell(60, 10, $row['email'], 1);
+          $pdf->Cell(20, 10, $row['gender'], 1);
+          $pdf->Cell(35, 10, $row['Instructor_Id'], 1);
+          $pdf->Cell(25, 10, $row['cost'], 1);
+          $pdf->Ln();
+
+          // Collect data for charts
+          $data_for_charts[] = $row;
+      }
+  } else {
+      $pdf->Cell(0, 10, "No records found for the given date range.", 0, 1);
+  }
+
+  // Include charts if requested
+  if ($include_charts) {
+      generate_charts($data_for_charts);  // Ensure you have a chart generation function
+      $pdf->Image('chart.png', 10, $pdf->GetY(), 190);
+  }
+  // Move the cursor to the bottom for additional text
+$pdf->Ln(20);  // Add space after charts or table
+
+// Add text at the bottom of the PDF
+$pdf->SetFont('Arial', 'I', 10);
+$pdf->Cell(0, 10, "Note: This is an auto-generated report. For any inquiries, please contact our support team.", 0, 1, 'C');
+$pdf->Ln(5);
+$pdf->Cell(0, 10, "Email: support@example.com | Phone: +1-800-555-1234", 0, 1, 'C');
+  // Save the PDF
+  $report_file_name = "Instructor_P_Revenue_Report" . time() . ".pdf";
+  $pdf->Output('F', 'reports/' . $report_file_name);
+
+  // Save report name to the database using prepared statements
+  $stmt = $conn->prepare("INSERT INTO generated_reports (report_name) VALUES (?)");
+  $stmt->bind_param("s", $report_file_name);
+  $stmt->execute();
+
+  // Optionally, store the filename in the session
+  $_SESSION['last_generated_report'] = $report_file_name;
+
+  // Close connection
+  $conn->close();
+
+  // Output the PDF
+  $pdf->Output();
+}
+
+function generate_user_report($start_date, $end_date, $include_charts, $conn) {
+  // SQL query
+  $stmt = $conn->prepare("SELECT u.user_id, u.user_name, u.email, u.gender, 
+                          m.Id, m.s_date, m.e_date, m.cost, m.Instructor_Id
+                          FROM users u
+                          JOIN instructor_user m ON u.user_id = m.user_Id 
+                          WHERE m.s_date >= ? AND m.s_date <= ?");
+  $stmt->bind_param("ss", $start_date, $end_date);  // Bind the start and end dates
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  // PDF Generation
+  $pdf = new FPDF();
+  $pdf->AddPage();
+  $pdf->SetFont('Arial', 'B', 12);
+
+  // Company letterhead
+  $pdf->Image('C:\wamp64\www\sahan\admin-main\IMG\logo.png', 10, 6, 30);
+
+  // Aligning header and adding date/time
+  $pdf->Cell(80);
+  $pdf->Cell(0, 10, "Generated on: " . date("Y-m-d H:i:s"), 0, 1, 'R');
+  $pdf->Ln(20);
+
+  // Dynamic search period
+  $pdf->Cell(0, 10, "Search Period: " . $start_date . " to " . $end_date, 0, 1, 'L');
+  $pdf->Ln(10);
+
+  // Header
+  $pdf->Cell(0, 10, "User Information Report", 0, 1, 'C');
+  $pdf->Ln();
+
+  // Column Headers
+  $pdf->SetFont('Arial', 'B', 10);
+  $pdf->Cell(30, 10, 'User ID', 1);
+  $pdf->Cell(40, 10, 'User Name', 1);
+  $pdf->Cell(60, 10, 'Email', 1);
+  $pdf->Cell(20, 10, 'Gender', 1);
+  $pdf->Cell(35, 10, 'Instructor', 1);
+  $pdf->Cell(25, 10, 'Cost', 1);
+  $pdf->Ln();
+
+  // Data for charts
+  $data_for_charts = [];
+
+  // Populate table with data
+  if ($result->num_rows > 0) {
+      while ($row = $result->fetch_assoc()) {
+          $pdf->SetFont('Arial', '', 10);
+          $pdf->Cell(30, 10, $row['user_id'], 1);
+          $pdf->Cell(40, 10, $row['user_name'], 1);
+          $pdf->Cell(60, 10, $row['email'], 1);
+          $pdf->Cell(20, 10, $row['gender'], 1);
+          $pdf->Cell(35, 10, $row['Instructor_Id'], 1);
+          $pdf->Cell(25, 10, $row['cost'], 1);
+          $pdf->Ln();
+
+          // Collect data for charts
+          $data_for_charts[] = $row;
+      }
+  } else {
+      $pdf->Cell(0, 10, "No records found for the given date range.", 0, 1);
+  }
+
+  // Include charts if requested
+  if ($include_charts) {
+      generate_charts($data_for_charts);  // Ensure you have a chart generation function
+      $pdf->Image('chart.png', 10, $pdf->GetY(), 190);
+  }
+  // Move the cursor to the bottom for additional text
+$pdf->Ln(20);  // Add space after charts or table
+
+// Add text at the bottom of the PDF
+$pdf->SetFont('Arial', 'I', 10);
+$pdf->Cell(0, 10, "Note: This is an auto-generated report. For any inquiries, please contact our support team.", 0, 1, 'C');
+$pdf->Ln(5);
+$pdf->Cell(0, 10, "Email: support@example.com | Phone: +1-800-555-1234", 0, 1, 'C');
+  // Save the PDF
+  $report_file_name = "User_Data_Report" . time() . ".pdf";
+  $pdf->Output('F', 'reports/' . $report_file_name);
+
+  // Save report name to the database using prepared statements
+  $stmt = $conn->prepare("INSERT INTO generated_reports (report_name) VALUES (?)");
+  $stmt->bind_param("s", $report_file_name);
+  $stmt->execute();
+
+  // Optionally, store the filename in the session
+  $_SESSION['last_generated_report'] = $report_file_name;
+
+  // Close connection
+  $conn->close();
+
+  // Output the PDF
+  $pdf->Output();
+}
     switch($report_type){
         case 'full_revenue':
             generate_full_revenue_report($start_date, $end_date, $include_charts,$conn);
             break;
         case 'week_revenue':
-            generate_week_revenue_report($start_date, $end_date, $include_charts);
+            generate_week_revenue_report($start_date, $end_date, $include_charts,$conn);
             break;
         case 'month_revenue':
-            generate_month_revenue_report($start_date, $end_date, $include_charts);
+            generate_month_revenue_report($start_date, $end_date, $include_charts,$conn);
             break;
         case 'year_revenue':
-            generate_year_revenue_report($start_date, $end_date, $include_charts);
+            generate_year_revenue_report($start_date, $end_date, $include_charts,$conn);
             break;
         case 'instructor':
-            generate_instructor_report($start_date, $end_date, $include_charts);
+            generate_instructor_report($start_date, $end_date, $include_charts,$conn);
             break;
         case 'user_Repoart':
-            generate_user_report($start_date, $end_date, $include_charts);
+            generate_user_report($start_date, $end_date, $include_charts,$conn);
             break;
         case 'Online_Clz':
-            generate_online_clz_report($start_date, $end_date, $include_charts);
+            generate_online_clz_report($start_date, $end_date, $include_charts,$conn);
             break;
         default:
             echo "Invalid report type!";
@@ -164,36 +643,7 @@ function generate_charts($data) {
     imagedestroy($image);  // Free memory
 }
 
-    // Use the report type and date range to generate the report
-    // switch ($report_type) {
-    //     case 'full_revenue':
-    //         // Generate Full Revenue Report
-    //         echo "<script>alert('Generating Full Revenue Report from $start_date to $end_date');</script>";
-    //         break;
-    //     case 'week_revenue':
-    //       echo "<script>alert('Generating week Revenue Report from $start_date to $end_date');</script>";
-    //         break;
-    //     case 'month_revenue':
-    //       echo "<script>alert('Generating Month Revenue Report from $start_date to $end_date');</script>";
-    //         break;
-    //     case 'year_revenue':
-    //       echo "<script>alert('Generating year Revenue Report from $start_date to $end_date');</script>";
-    //         break;
-    //     case 'instructor':
-    //       echo "<script>alert('Generating Insreutor Revenue Report from $start_date to $end_date');</script>";
-    //         break;
-    //     default:
-    //         echo "Invalid report type!";
-    //         break;
-    // }
-
-    // Optionally include charts if requested
-    // if ($include_charts) {
-    //     // Code to generate charts (e.g., using Google Charts or Chart.js)
-    // }
-
-    // Output the generated report (e.g., display it or download as PDF)
-
+   
 ?>
 
 
@@ -244,8 +694,7 @@ function generate_charts($data) {
         <option value="month_revenue">Month Revenue Report</option>
         <option value="year_revenue">Year Revenue Report</option>
         <option value="instructor">Instructor Report</option>
-        <option value="user_Repoart">User Report</option>
-        <option value="Online_Clz">Online clz Report</option>
+        
       </select>
     </div>
 
