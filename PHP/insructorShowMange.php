@@ -29,6 +29,38 @@ if ($result->num_rows > 0) {
     }
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $I_D = $_POST['I_D'];
+    $I_N = $_POST['I_N'];
+    $I_P = $_POST['I_P'];
+    $D_01 = $_POST['D_01'];
+    $photo = isset($_FILES['photo']['name']) ? $_FILES['photo']['name'] : '';
+    
+    // Handle file upload
+    if (!empty($photo)) {
+        $target_dir = "../IMG/";
+        $target_file = $target_dir . basename($photo);
+        move_uploaded_file($_FILES['photo']['tmp_name'], $target_file);
+    } else {
+        // If no new photo is uploaded, keep the existing photo
+        $photoQuery = "SELECT In_photo FROM instructor_show WHERE Instructor_Id  = '$I_D'";
+        $photoResult = $conn->query($photoQuery);
+        if ($photoResult->num_rows > 0) {
+            $photoRow = $photoResult->fetch_assoc();
+            $photo = $photoRow['In_photo'];
+        }
+    }
+
+    $sql = "UPDATE instructor_show SET Name='$I_N', price='$I_P', description='$D_01', In_photo='$photo' WHERE Instructor_Id='$I_D'";
+    if ($conn->query($sql) === TRUE) {
+        echo '<script>alert("Record updated successfully")</script>';
+        echo '<script>window.history.replaceState({}, document.title, "insructorShowMange.php");</script>';
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
+
+
 
 ?>
 
@@ -136,10 +168,14 @@ if ($result->num_rows > 0) {
 <div class="container mt-5">
    
         <button class="btn btn-secondary mb-3" onclick="window.history.back();">Back</button>
-        <form method="POST" action="addInstructor2.php">
+        <form method="POST" action="insructorShowMange.php">
+        <div class="mb-3">
+                <label for="I_D" class="form-label">Instructor ID </label>
+                <input type="text" class="form-control " id="I_D" name="I_D" value="" required readonly>
+            </div>
             <div class="mb-3">
-                <label for="I_D" class="form-label">Name </label>
-                <input type="text" class="form-control " id="I_D" name="I_D" value="" required>
+                <label for="I_N" class="form-label">Name </label>
+                <input type="text" class="form-control " id="I_N" name="I_N" value="" required>
             </div>
             <div class="mb-3">
                 <label for="I_P" class="form-label">Price</label>
@@ -180,7 +216,8 @@ if ($result->num_rows > 0) {
         .then(data => {
             // Populate form fields with the fetched data
             console.log(data);
-            document.getElementById('I_D').value = data.planDuration;
+            document.getElementById('I_D').value = data.planId;
+            document.getElementById('I_N').value = data.planDuration;
             document.getElementById('I_P').value = data.planPrice;
             document.getElementById('D_01').value = data.benefit1;
             

@@ -22,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Fetch data as an associative array
         $row = $result->fetch_assoc();
         echo json_encode([
+            'planId' => $row['Instructor_Id'],
             'planDuration' => $row['Name'],
             'planPrice' => $row['price'],
             'benefit1' => $row['description']
