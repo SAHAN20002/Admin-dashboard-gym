@@ -46,8 +46,13 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
       $_SESSION['NIC'] = $row['NIC'];
       $_SESSION['Instrutor_ID'] = $row['Instrutor_ID'];
       $_SESSION['user_name'] = $row['user_name'];
+
+      if($row['Avilable_Status'] == 0){
+        header('Location: disable.php');
+      }else{
           
-      header('Location: instructor.php');
+         header('Location: instructor.php');
+      }
       }
     } else {
       echo "<script>

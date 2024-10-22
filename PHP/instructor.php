@@ -5,7 +5,14 @@ session_start();
 if(!isset($_SESSION['NIC'] )){
  header('Location: index.php');
 }else{
-
+$chekavilablesql = "SELECT * FROM instrutor WHERE NIC = '".$_SESSION['NIC']."'";
+$result = $conn->query($chekavilablesql);
+if ($result->num_rows > 0) {
+  $row = $result->fetch_assoc();
+  if($row['Avilable_Status'] == 0){
+    header('Location: disable.php');
+  }
+}
 
   $instructorId = $_SESSION['Instrutor_ID'];
   $total_user = "N/A";
