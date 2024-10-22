@@ -495,10 +495,11 @@ if(isset($_POST['logout'])) {
     <!-- Top Navbar -->
     <div class="navbar">
       <div class="search-bar">
-        <input type="button" placeholder="Add Instructor" value="Add Instructor" onclick="window.location.href='addInstructor.php'">
+        <!-- <input type="button" placeholder="Add Instructor" value="Add Instructor" onclick="window.location.href='addInstructor.php'"> -->
+        <input type="button" style="background-color:red; cursor:pointer" placeholder="Delete Instructor" value="Instructor" onclick="window.location.href='instructorDeletePaswordChk.php'">
       </div>
       <div class="search-bar">
-      <input type="button" style="background-color:red" placeholder="Delete Instructor" value="Delete Instructor" onclick="window.location.href='instructorDeletePaswordChk.php'">
+      <!-- <input type="button" style="background-color:red" placeholder="Delete Instructor" value="Delete Instructor" onclick="window.location.href='instructorDeletePaswordChk.php'"> -->
       </div>
      
      <select id="scrollSelect" style="width: 400px; height: 40px; border-radius: 20px;font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 16px; text-align: center; background-color: rgba(240, 248, 255, 0.3); border-color: #f8d700;">

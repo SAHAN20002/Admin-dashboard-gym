@@ -59,12 +59,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if ($conn->query($sql) === TRUE) {
            
-            echo '<script>
-                  window.history.replaceState({}, document.title, "onlineClzMange.php");
-                  window.onpopstate = function() {
-                  window.history.go(1); // Prevent going back
-                 };
-                 </script>';
+                echo "<script>
+                    document.getElementById('C_I').value = '';
+                    document.getElementById('T_P').value = '';
+                    document.getElementById('I_N').value = '';
+                    document.getElementById('S_T').value = '';
+                    document.getElementById('D_A').value = '';
+                    document.getElementById('L_K').value = '';
+                    document.getElementById('sumbit').style.display = '';
+                    document.getElementById('updated').style.display = 'none';
+                    window.location.reload();
+                </script>";
             echo "<script>alert('Class successfully updated');</script>";
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;
