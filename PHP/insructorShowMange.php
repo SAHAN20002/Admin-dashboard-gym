@@ -1,5 +1,7 @@
 <?php 
 include 'phpcon.php';
+include 'imageupload.php';
+
 session_start();
 if(!isset($_SESSION['admin_Id'])) {
    header('Location: index.php');
@@ -34,24 +36,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $I_N = $_POST['I_N'];
     $I_P = $_POST['I_P'];
     $D_01 = $_POST['D_01'];
-    $photo = isset($_FILES['photo']['name']) ? $_FILES['photo']['name'] : '';
+    $photo = isset($_FILES['image']) ? $_FILES['image'] : '';
     
-    // Handle file upload
-    if (!empty($photo)) {
-        $target_dir = "../IMG/";
-        $target_file = $target_dir . basename($photo);
-        move_uploaded_file($_FILES['photo']['tmp_name'], $target_file);
-    } else {
-        // If no new photo is uploaded, keep the existing photo
-        $photoQuery = "SELECT In_photo FROM instructor_show WHERE Instructor_Id  = '$I_D'";
-        $photoResult = $conn->query($photoQuery);
-        if ($photoResult->num_rows > 0) {
-            $photoRow = $photoResult->fetch_assoc();
-            $photo = $photoRow['In_photo'];
+    
+    if ($photo && $photo['error'] == 0) {
+        $photolink = saveImage($photo);
+        $fullpath = "http://localhost/sahan/ADMIN-MAIN/PHP/".$photolink;
+        echo'<script>alert("'.$fullpath.'")</script>';
+    }else {
+        $instructorQuery = "SELECT In_photo FROM instructor_show WHERE Instructor_Id ='$I_D'";
+        $instructorResult = $conn->query($instructorQuery);
+        if ($instructorResult->num_rows > 0) {
+            $instructorRow = $instructorResult->fetch_assoc();
+            $fullpath = $instructorRow['In_photo'];
+        } else {
+            $fullpath = 'not photo uploaded';
         }
     }
 
-    $sql = "UPDATE instructor_show SET Name='$I_N', price='$I_P', description='$D_01', In_photo='$photo' WHERE Instructor_Id='$I_D'";
+    $sql = "UPDATE instructor_show SET Name='$I_N', price='$I_P', description='$D_01', In_photo='$fullpath' WHERE Instructor_Id='$I_D'";
     if ($conn->query($sql) === TRUE) {
         echo '<script>alert("Record updated successfully")</script>';
         echo '<script>window.history.replaceState({}, document.title, "insructorShowMange.php");</script>';
@@ -116,30 +119,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <button class="btn btn-warning mb-3" style="display:<?php echo $button; ?>;" id="ChnageSataus">mark as done</button>
     <hr>
     <div class="row text-center">
-
+    <h4 class="text-center mt-3 mb-3">Websites preview cards</h4>
     <?php 
        $sqlPlan = "SELECT * FROM instructor_show";
          $resultPlan = $conn->query($sqlPlan);
             if ($resultPlan->num_rows > 0) {
                 while($row = $resultPlan->fetch_assoc()) {
 
-                   
+                   $getInstructoruploadDeatilssql = "SELECT * FROM instrutor WHERE Instrutor_ID = '".$row["Instructor_Id"]."'";
+                     $getInstructoruploadDeatilsresult = $conn->query($getInstructoruploadDeatilssql);
+                        if ($getInstructoruploadDeatilsresult->num_rows > 0) {
+                            $getInstructoruploadDeatilsrow = $getInstructoruploadDeatilsresult->fetch_assoc();
+                            $getInstrutorName = $getInstructoruploadDeatilsrow["user_name"];
+                            $getInstructorDescrpition = $getInstructoruploadDeatilsrow["description"];
+                            $getINstructorPhone_number = $getInstructoruploadDeatilsrow["p_number"];
+                        }
+
                            echo'
                              <!-- Card 1 -->
                                <div class="col-md-4 mb-4">
                                   <div class="card text-white bg-dark">
-                                  <img src="../IMG/team-2.jpg" class="card-img-top" alt="Instructor Image">
+                                    <img src="'.$row["In_photo"].'" class="card-img-top" alt="Instructor Image">
                                     <div class="card-body">
                                       <h5 class="card-title">'.$row["Instructor_Id"].'</h5>
                                        <h3 class="text-warning">'.$row["Name"].'</h3>
                                         <ul class="list-unstyled">
+
                                           <li>'.$row["price"].'</li>
                                           <li>'.$row["description"].'</li>
                                          
                                         </ul>
-                                     </div>
+                                    </div>
                                   </div>
-                               </div>';
+                                  <hr>
+                                  <div class="card text-dark bg-white mt-2" style="border-color: yellow;">
+                                    <h4 class="text-center">Instructor Upload Details</h4>
+                                    <div class="card-body">
+                                      <h5 class="card-title">'.$getInstrutorName.'</h5>
+                                       <h3 class="text-warning">'.$getInstructorDescrpition.'</h3>
+                                        <ul class="list-unstyled">
+
+                                          
+                                          <li>'.$getINstructorPhone_number.'</li>
+                                         
+                                        </ul>
+                                    </div>
+                                  </div>
+                               </div>
+                                      ';
+                               
+            
+
                             
                         }
                     }
@@ -168,7 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="container mt-5">
    
         <button class="btn btn-secondary mb-3" onclick="window.history.back();">Back</button>
-        <form method="POST" action="insructorShowMange.php">
+        <form method="POST" action="insructorShowMange.php" enctype="multipart/form-data">
         <div class="mb-3">
                 <label for="I_D" class="form-label">Instructor ID </label>
                 <input type="text" class="form-control " id="I_D" name="I_D" value="" required readonly>
@@ -186,8 +216,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="text" class="form-control" id="D_01" name="D_01" value="" required>
             </div>
             <div class="mb-3">
-                <label for="photo" class="form-label">Photo</label>
-                <input type="file" class="form-control" id="photo" name="photo">
+                <label for="image" class="form-label">Photo</label>
+                <input type="file" class="form-control" id="image" name="image">
             </div>
             <div class="text-center">
                 <button type="submit" class="btn btn-primary btn-lg mb-3">Submit</button>
