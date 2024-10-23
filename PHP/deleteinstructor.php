@@ -29,6 +29,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nic = $_POST['nic'];
     $password = $_POST['password'];
 
+    $chekitsavilable = "SELECT * FROM instrutor WHERE NIC = '$nic'";
+    $result = $conn->query($chekitsavilable);
+
+    if ($result->num_rows > 0) {
+        echo "<script>alert('NIC already exists');window.location.href = window.location.href;</script>";
+        exit;
+    }
+
     $updateQuery = "UPDATE instrutor SET NIC = '$nic', Password = '$password' WHERE Instrutor_ID = '$member_id'";
     $conn->query($updateQuery);
     if ($conn->query($updateQuery) === TRUE) {
@@ -113,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
         <div class="card-container">
             <h2 class="text-center">Instructor List (Max 3 Members)</h2>
-            <button class="btn btn-secondary mb-3" onclick="window.history.back();">Back</button>
+            <button class="btn btn-secondary mb-3" onclick="">Back</button>
             <div class="row">
                 <?php foreach ($members as $member): ?>
                 <div class="col-md-4 mb-3">
