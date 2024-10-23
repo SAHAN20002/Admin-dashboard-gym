@@ -36,7 +36,7 @@ function mailsend($to, $subject, $message, $headers) {
 
     // Send the email
     if ($mail->send()) {
-        echo "Email sent successfully.";
+        // echo "Email sent successfully.";
         return true;
     } else {
         echo "Failed to send email. Error: " . $mail->ErrorInfo;
