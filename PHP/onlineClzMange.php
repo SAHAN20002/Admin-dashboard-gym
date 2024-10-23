@@ -42,6 +42,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if ($conn->query($sql) === TRUE) {
             echo "<script>alert('New class successfully created');</script>";
+            echo "<script>window.history.back();</script>";
+            echo "<script>
+                document.getElementById('C_I').value = '';
+                document.getElementById('T_P').value = '';
+                document.getElementById('I_N').value = '';
+                document.getElementById('S_T').value = '';
+                document.getElementById('D_A').value = '';
+                document.getElementById('L_K').value = '';
+                document.getElementById('sumbit').style.display = '';
+                document.getElementById('updated').style.display = 'none';
+            </script>";
            
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;
