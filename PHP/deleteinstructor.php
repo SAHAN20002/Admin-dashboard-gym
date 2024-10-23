@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
         <div class="card-container">
             <h2 class="text-center">Instructor List (Max 3 Members)</h2>
-            <button class="btn btn-secondary mb-3" onclick="">Back</button>
+            <button class="btn btn-secondary mb-3" onclick="window.location.href='dashboard.php'">Back</button>
             <div class="row">
                 <?php foreach ($members as $member): ?>
                 <div class="col-md-4 mb-3">
