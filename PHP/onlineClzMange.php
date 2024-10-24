@@ -92,10 +92,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 
-
-    
-   
-
 ?>
 
 
@@ -178,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="col-md-6">
         <form class="d-flex">
             <input class="form-control me-2" type="search"id="search_text" placeholder="Search Memberships" aria-label="Search">
-            <button class="btn btn-outline-success"id="search" type="submit">Search</button>
+            <button class="btn btn-outline-success" id="search" type="submit">Search</button>
         </form>
     </div>
 </div>
@@ -231,6 +227,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     document.getElementById('search').addEventListener('click', function(e) {
         e.preventDefault();
         let searchText = document.getElementById('search_text').value;
+
         if (searchText.trim() === '') {
             alert('Please enter a search keyword');
             return;
@@ -245,7 +242,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            
             if (data.error) {
             alert(data.error);
             } else {

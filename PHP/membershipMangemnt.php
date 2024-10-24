@@ -115,6 +115,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 <div class="container mt-5">
    
         <button class="btn btn-secondary mb-3" onclick="window.history.back();">Back</button>
+        
         <form method="POST" action="membershipMangemnt.php">
             <div class="mb-3" style="display:none;">
                 <label for="P_I" class="form-label">Plan ID </label>

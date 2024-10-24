@@ -31,10 +31,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $chekitsavilable = "SELECT * FROM instrutor WHERE NIC = '$nic'";
     $result = $conn->query($chekitsavilable);
+    $row = $result->fetch_assoc();
+    $Password_old = $row['Password'];
 
     if ($result->num_rows > 0) {
-        echo "<script>alert('NIC already exists');window.location.href = window.location.href;</script>";
-        exit;
+        
+        if($Password_old == $password){
+            echo "<script>alert('NIC already exists');window.location.href = window.location.href;</script>";
+            exit;
+        }else{
+            $UpdateSQL = "UPDATE instrutor SET Password = '$password' WHERE NIC = '$nic'";
+            $conn->query($UpdateSQL);
+            if ($conn->query($UpdateSQL) === TRUE) {
+                echo "<script>alert('Record updated successfully'); window.location.href = window.location.href;</script>";
+            } else {
+                echo "<script>alert('Error updating record: " . $conn->error . "');</script>";
+            }    
+        }
+
+        
     }
 
     $updateQuery = "UPDATE instrutor SET NIC = '$nic', Password = '$password' WHERE Instrutor_ID = '$member_id'";

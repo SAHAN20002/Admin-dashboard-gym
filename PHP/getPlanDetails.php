@@ -1,7 +1,8 @@
 <?php
 include 'phpcon.php';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Database connection (replace with your details)
+   
     
     
     // Check connection
