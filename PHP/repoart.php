@@ -6,7 +6,7 @@ date_default_timezone_set('Asia/Colombo'); // Set your timezone here, e.g., 'Ame
 include 'phpcon.php';
 
 session_start();
-$current_time = date("Y-m-d H:i:s");
+$current_time = date("Y-m-d H:i:s");  // authentication type which admin other users can search by the page and can log but the this authentication cant that ....
 if(!isset($_SESSION['admin_Id'])) {
    header('Location: index.php');
 }
